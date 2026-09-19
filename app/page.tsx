@@ -1,30 +1,14 @@
 "use client";
 
 import React, { useState, ChangeEvent, FormEvent } from 'react';
+import Link from 'next/link';
 
-// Define the structure of our data types for TypeScript
-interface CartItem {
-  id: number;
-  title: string;
-  price: number;
-  type: string;
-}
-
-export default function PioneerAcademy() {
+export default function Homepage() {
   const [formData, setFormData] = useState({
-    studentName: '',
-    parentName: '',
-    mobile: '',
-    email: '',
-    grade: '',
-    targetExam: 'NEET'
+    studentName: '', mobile: '', grade: '', batch: ''
   });
-  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('');
-  const [activeTab, setActiveTab] = useState<'NEET' | 'JEE'>('NEET');
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -33,165 +17,71 @@ export default function PioneerAcademy() {
   const handleLeadSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    try {
-      setTimeout(() => {
-        setSubmitStatus('Success! We will contact you shortly.');
-        setFormData({ studentName: '', parentName: '', mobile: '', email: '', grade: '', targetExam: 'NEET' });
-        setIsSubmitting(false);
-      }, 1000);
-    } catch (error) {
-      setSubmitStatus('An error occurred. Please try again.');
+    setTimeout(() => {
+      setSubmitStatus('Success! We will contact you shortly.');
+      setFormData({ studentName: '', mobile: '', grade: '', batch: '' });
       setIsSubmitting(false);
-    }
+    }, 1000);
   };
-
-  const addToCart = (item: CartItem) => {
-    setCart([...cart, item]);
-    setIsCartOpen(true);
-  };
-
-  const faculties = [
-    { name: "Dr. Narendra Shekhawat", role: "Patron & Motivator", exp: "40+ Years Combined" },
-    { name: "Dr. Jogendra Singh", role: "H.O.D. Chemistry", exp: "14 Years Exp." },
-    { name: "Mr. Girish Sharma", role: "H.O.D. Physics", exp: "16 Years Exp." },
-    { name: "Dr. H.K. Suthar", role: "H.O.D. Biology", exp: "15 Years Exp." }
-  ];
-
-  const features = [
-    "Legendary Faculties", "Daily Doubt Clearing Sessions", "Weekly & Monthly Tests",
-    "Digital Board Classrooms", "0% Interest EMI Facility", "Fully A.C. Building & Hostel"
-  ];
-
-  const pyqData: Record<'NEET' | 'JEE', { year: string; title: string }[]> = {
-    NEET: [
-      { year: "2023", title: "NEET 2023 Paper & Detailed Solutions" },
-      { year: "2022", title: "NEET 2022 Paper & Detailed Solutions" },
-      { year: "2021", title: "NEET 2021 Paper & Detailed Solutions" }
-    ],
-    JEE: [
-      { year: "2023", title: "JEE Main & Adv 2023 Solutions" },
-      { year: "2022", title: "JEE Main & Adv 2022 Solutions" },
-      { year: "2021", title: "JEE Main & Adv 2021 Solutions" }
-    ]
-  };
-
-  const storeItems: CartItem[] = [
-    { id: 1, title: "NEET 2024 All India Test Series", price: 2999, type: "Test Series" },
-    { id: 2, title: "JEE Main Complete Study Material", price: 4500, type: "Study Material" },
-    { id: 3, title: "Foundation (XI-XII) Question Bank", price: 1500, type: "Study Material" }
-  ];
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-gray-900">
-      
-      {/* Navigation Bar */}
-      <nav className="bg-[#162b66] text-white p-4 sticky top-0 z-50 shadow-lg">
+      {/* Navigation */}
+      <nav className="bg-[#162b66] text-white p-4 sticky top-0 z-50 shadow-md">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-[#f9d200] text-[#162b66] rounded-full flex items-center justify-center font-bold text-xl italic">
-              π
-            </div>
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-10 h-10 bg-[#f9d200] text-[#162b66] rounded-full flex items-center justify-center font-bold text-xl italic">π</div>
             <div>
               <h1 className="font-bold text-2xl tracking-wider text-[#00b4d8]">PIONEER</h1>
               <p className="text-xs text-[#f9d200] font-semibold tracking-widest uppercase">Academy</p>
             </div>
+          </Link>
+          <div className="hidden md:flex gap-6 font-medium items-center">
+            <Link href="/programs/neet" className="hover:text-[#f9d200] transition-colors">NEET</Link>
+            <Link href="/programs/jee" className="hover:text-[#f9d200] transition-colors">JEE</Link>
+            <Link href="/resources" className="hover:text-[#f9d200] transition-colors">Free Material</Link>
+            <Link href="/pyq" className="hover:text-[#f9d200] transition-colors">PYQs</Link>
+            <Link href="/test-series" className="bg-[#f9d200] text-[#162b66] px-4 py-2 rounded-md hover:bg-yellow-500 font-bold transition-colors">Test Series</Link>
           </div>
-          <div className="hidden md:flex gap-6 font-medium">
-            <a href="#about" className="hover:text-[#f9d200] transition-colors">About Us</a>
-            <a href="#faculties" className="hover:text-[#f9d200] transition-colors">Faculties</a>
-            <a href="#pyq" className="hover:text-[#f9d200] transition-colors">Previous Year Papers</a>
-            <a href="#store" className="hover:text-[#f9d200] transition-colors">Test Series & Store</a>
-          </div>
-          <button onClick={() => setIsCartOpen(!isCartOpen)} className="bg-[#f9d200] text-[#162b66] px-4 py-2 rounded-md font-bold flex items-center gap-2">
-            Cart ({cart.length})
-          </button>
         </div>
       </nav>
 
-      {/* Cart Modal */}
-      {isCartOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end">
-          <div className="bg-white w-96 h-full p-6 shadow-2xl overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-[#162b66]">Your Cart</h2>
-              <button onClick={() => setIsCartOpen(false)} className="text-gray-500 hover:text-black">✖</button>
-            </div>
-            {cart.length === 0 ? (
-              <p className="text-gray-500">Your cart is empty.</p>
-            ) : (
-              <div className="space-y-4">
-                {cart.map((item, idx) => (
-                  <div key={idx} className="border-b pb-2">
-                    <p className="font-semibold text-gray-800">{item.title}</p>
-                    <p className="text-[#162b66] font-bold">₹{item.price}</p>
-                  </div>
-                ))}
-                <div className="pt-4">
-                  <p className="text-xl font-bold mb-4">Total: ₹{cart.reduce((a, b) => a + b.price, 0)}</p>
-                  <button className="w-full bg-[#f9d200] text-[#162b66] font-bold py-3 rounded-md">Checkout Now</button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Hero Section & Lead Capture */}
-      <section className="bg-[#162b66] text-white pt-12 pb-20 px-4">
+      {/* 1. Hero Section */}
+      <section className="bg-gradient-to-br from-[#162b66] to-[#0d1a40] text-white pt-16 pb-24 px-4">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
-            <div className="inline-block bg-[#00b4d8] text-white px-3 py-1 rounded-full text-sm font-semibold tracking-wide">
+            <div className="inline-block bg-white/10 text-[#f9d200] px-4 py-1 rounded-full text-sm font-bold tracking-wide border border-[#f9d200]/30">
               Admissions Open 2024-25
             </div>
             <h2 className="text-4xl md:text-6xl font-extrabold leading-tight">
-              First time in Bikaner, a team of <span className="text-[#f9d200]">Legendary Faculties</span>
+              Realize Your IIT & NEET Dreams with Bikaner’s Premier Academy.
             </h2>
-            <p className="text-xl text-gray-200">
-              An institute for NEET / IIT-JEE (Main + Advance) / XI-XII Foundation & Pre-Foundation (VIII to X).
+            <p className="text-lg text-gray-300 leading-relaxed">
+              Expert faculty, personalized attention, and a proven track record. We empower ambitious students to crack highly competitive exams through a supportive and rigorous learning environment.
             </p>
-            <div className="flex gap-4">
-              <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
-                <span className="text-[#f9d200] font-bold text-2xl">40+</span>
-                <span className="text-sm leading-tight">Years Combined<br/>Experience</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
-                <span className="text-[#f9d200] font-bold text-2xl">100%</span>
-                <span className="text-sm leading-tight">Doubt Clearing<br/>Assurance</span>
-              </div>
+            <div className="flex gap-4 pt-4">
+              <Link href="#programs" className="bg-[#f9d200] text-[#162b66] px-6 py-3 rounded-md font-bold text-lg hover:bg-yellow-500 transition">Explore Courses</Link>
             </div>
           </div>
 
-          {/* Lead Generation Form */}
-          <div className="bg-white rounded-xl p-8 shadow-2xl text-gray-800" id="register">
-            <h3 className="text-2xl font-bold text-center text-[#162b66] mb-6">Register for Free Counselling</h3>
+          {/* Lead Capture Form */}
+          <div className="bg-white rounded-2xl p-8 shadow-2xl text-gray-800 border-t-4 border-[#f9d200]">
+            <h3 className="text-2xl font-black text-center text-[#162b66] mb-2">Book Free Counseling</h3>
+            <p className="text-center text-gray-500 text-sm mb-6">Take the first step towards your dream college.</p>
             <form onSubmit={handleLeadSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Student Name</label>
-                  <input type="text" name="studentName" required value={formData.studentName} onChange={handleInputChange} className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#162b66]" />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Parent Name</label>
-                  <input type="text" name="parentName" required value={formData.parentName} onChange={handleInputChange} className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#162b66]" />
-                </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Student Name</label>
+                <input type="text" name="studentName" required value={formData.studentName} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#162b66] outline-none transition" />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Mobile Number</label>
+                <input type="tel" name="mobile" pattern="[0-9]{10}" required value={formData.mobile} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#162b66] outline-none transition" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Mobile Number</label>
-                  <input type="tel" name="mobile" required value={formData.mobile} onChange={handleInputChange} className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#162b66]" />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Email ID</label>
-                  <input type="email" name="email" required value={formData.email} onChange={handleInputChange} className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#162b66]" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Current Grade</label>
-                  <select name="grade" required value={formData.grade} onChange={handleInputChange} className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#162b66] bg-white">
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Current Grade</label>
+                  <select name="grade" required value={formData.grade} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:ring-2 focus:ring-[#162b66] outline-none">
                     <option value="">Select</option>
-                    <option value="8th">8th</option>
                     <option value="9th">9th</option>
                     <option value="10th">10th</option>
                     <option value="11th">11th</option>
@@ -200,160 +90,101 @@ export default function PioneerAcademy() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Target Exam</label>
-                  <select name="targetExam" required value={formData.targetExam} onChange={handleInputChange} className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#162b66] bg-white">
-                    <option value="NEET">NEET</option>
-                    <option value="JEE">IIT-JEE</option>
-                    <option value="Foundation">Foundation</option>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Target Batch</label>
+                  <select name="batch" required value={formData.batch} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:ring-2 focus:ring-[#162b66] outline-none text-sm">
+                    <option value="">Select</option>
+                    <option value="Foundation">Foundation (9/10)</option>
+                    <option value="JEE_2_Year">JEE 2 Year (11/12)</option>
+                    <option value="JEE_1_Year">JEE 1 Year (12)</option>
+                    <option value="JEE_Target">JEE Target</option>
+                    <option value="NEET_2_Year">NEET 2 Year (11/12)</option>
+                    <option value="NEET_1_Year">NEET 1 Year (12)</option>
+                    <option value="NEET_Target">NEET Target</option>
                   </select>
                 </div>
               </div>
-              <button disabled={isSubmitting} type="submit" className="w-full bg-[#f9d200] hover:bg-yellow-500 text-[#162b66] font-bold text-lg py-3 rounded-md transition-colors mt-4">
-                {isSubmitting ? 'Submitting...' : 'Book Your Seat Now'}
+              <button disabled={isSubmitting} type="submit" className="w-full bg-[#162b66] text-white font-bold text-lg py-4 rounded-lg hover:bg-blue-900 transition-colors mt-2 shadow-lg">
+                {isSubmitting ? 'Requesting...' : 'Get Callback'}
               </button>
-              {submitStatus && <p className="text-center font-semibold text-green-600 mt-2">{submitStatus}</p>}
+              {submitStatus && <p className="text-center font-bold text-green-600 mt-2">{submitStatus}</p>}
             </form>
           </div>
         </div>
       </section>
 
-      {/* Why Pioneer Academy */}
-      <section id="about" className="py-16 px-4 max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-[#162b66] mb-4">Why Choose Pioneer Academy?</h2>
-          <div className="w-24 h-1 bg-[#f9d200] mx-auto"></div>
+      {/* 2. The Pioneer Pedagogy */}
+      <section className="py-20 px-4 max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-black text-[#162b66] mb-4">The Pioneer Advantage: Engineered for Success</h2>
+          <div className="w-24 h-1.5 bg-[#f9d200] mx-auto rounded-full"></div>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-          {features.map((feature, idx) => (
-            <div key={idx} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-[#00b4d8]/10 text-[#00b4d8] rounded-full flex items-center justify-center mb-4">
-                <span className="font-bold text-xl">✓</span>
-              </div>
-              <h4 className="font-bold text-gray-800">{feature}</h4>
+        <div className="grid md:grid-cols-4 gap-6">
+          {[
+            { title: "Expert-Led Concept Mastery", desc: "Learn directly from subject matter experts who break down complex topics into high-scoring concepts." },
+            { title: "Small Batch Sizes", desc: "No overcrowded halls. We strictly limit batch sizes to ensure every student gets individual attention." },
+            { title: "Continuous Assessment", desc: "Track progress with weekly tests and detailed performance analytics to identify weak points." },
+            { title: "Comprehensive Ecosystem", desc: "From state-of-the-art modern classrooms to complete study materials for a competitive edge." }
+          ].map((feature, idx) => (
+            <div key={idx} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+              <div className="w-14 h-14 bg-[#00b4d8]/10 text-[#00b4d8] rounded-xl flex items-center justify-center mb-6 text-2xl group-hover:scale-110 transition-transform">✓</div>
+              <h4 className="font-bold text-xl text-gray-900 mb-3">{feature.title}</h4>
+              <p className="text-gray-600 leading-relaxed text-sm">{feature.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Faculty Section */}
-      <section id="faculties" className="py-16 px-4 bg-gray-100">
-        <div className="max-w-7xl mx-auto">
+      {/* 3. Leadership & Vision */}
+      <section className="py-20 px-4 bg-gray-100">
+        <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-[#162b66] mb-4">Our Legendary Faculties</h2>
-            <div className="w-24 h-1 bg-[#f9d200] mx-auto"></div>
-          </div>
-          <div className="grid md:grid-cols-4 gap-8">
-            {faculties.map((faculty, idx) => (
-              <div key={idx} className="bg-white rounded-xl overflow-hidden shadow-md text-center border-b-4 border-[#162b66]">
-                <div className="h-48 bg-gray-200 flex items-center justify-center">
-                  <span className="text-gray-400 font-medium">Faculty Photo</span>
-                </div>
-                <div className="p-6">
-                  <h3 className="font-bold text-xl text-gray-900 mb-1">{faculty.name}</h3>
-                  <p className="text-[#00b4d8] font-semibold mb-3">{faculty.role}</p>
-                  <span className="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded font-bold">{faculty.exp}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* E-Commerce / Store Section */}
-      <section id="store" className="py-16 px-4 max-w-7xl mx-auto">
-         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-[#162b66] mb-4">Enroll & Buy Study Material</h2>
-          <div className="w-24 h-1 bg-[#f9d200] mx-auto"></div>
-        </div>
-        <div className="grid md:grid-cols-3 gap-8">
-          {storeItems.map((item) => (
-            <div key={item.id} className="border border-gray-200 rounded-xl p-6 bg-white shadow-sm flex flex-col">
-              <span className="text-xs font-bold text-[#00b4d8] uppercase tracking-wider mb-2">{item.type}</span>
-              <h3 className="text-xl font-bold text-gray-900 mb-4 flex-grow">{item.title}</h3>
-              <div className="flex justify-between items-center mt-auto pt-4 border-t border-gray-100">
-                <span className="text-2xl font-black text-[#162b66]">₹{item.price}</span>
-                <button onClick={() => addToCart(item)} className="bg-[#162b66] text-white px-4 py-2 rounded font-semibold hover:bg-blue-900 transition-colors">
-                  Add to Cart
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* SEO Section: Previous Year Papers & Solutions */}
-      <section id="pyq" className="py-16 px-4 bg-[#162b66] text-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-4">Previous Year Papers & Solutions</h2>
-            <p className="text-gray-300">Boost your preparation with comprehensive step-by-step solutions.</p>
+            <h2 className="text-3xl md:text-4xl font-black text-[#162b66] mb-4">Guided by Visionaries</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto text-lg">Pioneer Academy is led by educators who understand what it takes to win at the highest academic levels.</p>
+            <div className="w-24 h-1.5 bg-[#f9d200] mx-auto rounded-full mt-6"></div>
           </div>
           
-          <div className="flex justify-center gap-4 mb-8">
-            <button 
-              onClick={() => setActiveTab('NEET')}
-              className={`px-8 py-3 font-bold rounded-full transition-colors ${activeTab === 'NEET' ? 'bg-[#f9d200] text-[#162b66]' : 'bg-white/10 text-white hover:bg-white/20'}`}
-            >
-              NEET Papers
-            </button>
-            <button 
-              onClick={() => setActiveTab('JEE')}
-              className={`px-8 py-3 font-bold rounded-full transition-colors ${activeTab === 'JEE' ? 'bg-[#f9d200] text-[#162b66]' : 'bg-white/10 text-white hover:bg-white/20'}`}
-            >
-              JEE Papers
-            </button>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {pyqData[activeTab].map((paper, idx) => (
-              <div key={idx} className="bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-colors">
-                <h3 className="font-bold text-xl text-[#00b4d8] mb-2">{paper.year}</h3>
-                <p className="font-medium text-gray-200 mb-6">{paper.title}</p>
-                <div className="flex gap-3">
-                  <a href={`/solutions/${activeTab.toLowerCase()}/${paper.year}`} className="flex-1 text-center bg-white text-[#162b66] font-bold py-2 rounded hover:bg-gray-100 text-sm">
-                    View Solutions
-                  </a>
-                  <button className="flex-1 border border-white text-white font-bold py-2 rounded hover:bg-white/10 text-sm">
-                    Download PDF
-                  </button>
-                </div>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="bg-white rounded-2xl p-8 shadow-md flex gap-6 items-start border-l-4 border-[#162b66]">
+              <div className="w-24 h-24 bg-gray-200 rounded-full flex-shrink-0"></div>
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900">Dr. Narendra Shekhawat</h3>
+                <p className="text-[#00b4d8] font-bold mb-3">Founder / Director</p>
+                <p className="text-gray-600 text-sm leading-relaxed">Renowned for his educational philosophy and absolute dedication to bringing top-tier, structured competitive coaching to the students of Bikaner.</p>
               </div>
-            ))}
+            </div>
+            <div className="bg-white rounded-2xl p-8 shadow-md flex gap-6 items-start border-l-4 border-[#162b66]">
+              <div className="w-24 h-24 bg-gray-200 rounded-full flex-shrink-0"></div>
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900">Mr. Girish Sharma</h3>
+                <p className="text-[#00b4d8] font-bold mb-3">Founder / Director</p>
+                <p className="text-gray-600 text-sm leading-relaxed">With 28 years of mentoring experience, bringing unmatched expertise in physics and a clear vision for student success in national-level exams.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-12 px-4">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-[#f9d200] text-[#162b66] rounded-full flex items-center justify-center font-bold italic">π</div>
-              <h2 className="text-xl font-bold text-white">PIONEER ACADEMY</h2>
+      {/* 4. Our Programs */}
+      <section id="programs" className="py-20 px-4 max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-black text-[#162b66] mb-4">Tailored Courses for Every Goal</h2>
+          <div className="w-24 h-1.5 bg-[#f9d200] mx-auto rounded-full"></div>
+        </div>
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            { title: "NEET Coaching", tag: "Your Path to Top Medical Colleges.", desc: "Intensive curriculum covering Physics, Chemistry, and Biology. Focused on speed, accuracy, and NCERT mastery.", link: "/programs/neet" },
+            { title: "IIT-JEE Coaching", tag: "Engineer Your Future.", desc: "Rigorous preparation for JEE Main & Advanced. Heavy focus on problem-solving, advanced mathematics, and conceptual applications.", link: "/programs/jee" },
+            { title: "Foundation (9th-12th)", tag: "Build a Rock-Solid Foundation.", desc: "Specialized coaching aligned with CBSE and RBSE syllabus to ensure 95%+ board scores while preparing for competitive exams.", link: "/programs/foundation" }
+          ].map((prog, idx) => (
+            <div key={idx} className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm flex flex-col hover:shadow-xl transition-shadow">
+              <h3 className="text-2xl font-black text-[#162b66] mb-2">{prog.title}</h3>
+              <p className="text-[#00b4d8] font-bold text-sm mb-4">{prog.tag}</p>
+              <p className="text-gray-600 mb-8 flex-grow">{prog.desc}</p>
+              <Link href={prog.link} className="text-center w-full bg-gray-50 border border-gray-300 text-gray-800 font-bold py-3 rounded-lg hover:bg-gray-100 transition">View Plan</Link>
             </div>
-            <p className="text-sm">An institute where dedication, devotion, and hard work are the guiding principles.</p>
-          </div>
-          <div>
-            <h3 className="text-white font-bold mb-4 uppercase tracking-wider">Contact Us</h3>
-            <p className="text-sm mb-2">📞 +91 83022 24782</p>
-            <p className="text-sm mb-2">📞 78910-02402, 78910-02403</p>
-            <p className="text-sm mt-4"><strong>Main Campus:</strong> A-27, Near JNV Thana, Kanta Khaturia Colony, Bikaner</p>
-            <p className="text-sm mt-2"><strong>City Branch:</strong> Near City Dispensary No. 6, Outside Nathusar Gate, Bikaner</p>
-          </div>
-          <div>
-            <h3 className="text-white font-bold mb-4 uppercase tracking-wider">Quick Links</h3>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#about" className="hover:text-white">About the Institute</a></li>
-              <li><a href="#faculties" className="hover:text-white">Faculty Team</a></li>
-              <li><a href="#pyq" className="hover:text-white">Student Login</a></li>
-              <li><a href="#store" className="hover:text-white">Buy Study Materials</a></li>
-            </ul>
-          </div>
+          ))}
         </div>
-        <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-gray-800 text-center text-sm">
-          <p>© {new Date().getFullYear()} Pioneer Academy Bikaner. All rights reserved.</p>
-        </div>
-      </footer>
+      </section>
     </div>
   );
 }
