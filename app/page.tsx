@@ -1,6 +1,14 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, ChangeEvent, FormEvent } from 'react';
+
+// Define the structure of our data types for TypeScript
+interface CartItem {
+  id: number;
+  title: string;
+  price: number;
+  type: string;
+}
 
 export default function PioneerAcademy() {
   const [formData, setFormData] = useState({
@@ -11,26 +19,22 @@ export default function PioneerAcademy() {
     grade: '',
     targetExam: 'NEET'
   });
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('');
-  const [activeTab, setActiveTab] = useState('NEET');
-  const [cart, setCart] = useState([]);
+  const [activeTab, setActiveTab] = useState<'NEET' | 'JEE'>('NEET');
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleLeadSubmit = async (e) => {
+  const handleLeadSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Replace this URL with your actual Google Apps Script Webhook / Firebase URL
-    const GOOGLE_SHEET_WEBHOOK = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
-    
     try {
-      // Simulated API Call for Google Sheets Sync
-      // await fetch(GOOGLE_SHEET_WEBHOOK, { method: 'POST', body: JSON.stringify(formData) });
       setTimeout(() => {
         setSubmitStatus('Success! We will contact you shortly.');
         setFormData({ studentName: '', parentName: '', mobile: '', email: '', grade: '', targetExam: 'NEET' });
@@ -42,7 +46,7 @@ export default function PioneerAcademy() {
     }
   };
 
-  const addToCart = (item) => {
+  const addToCart = (item: CartItem) => {
     setCart([...cart, item]);
     setIsCartOpen(true);
   };
@@ -59,7 +63,7 @@ export default function PioneerAcademy() {
     "Digital Board Classrooms", "0% Interest EMI Facility", "Fully A.C. Building & Hostel"
   ];
 
-  const pyqData = {
+  const pyqData: Record<'NEET' | 'JEE', { year: string; title: string }[]> = {
     NEET: [
       { year: "2023", title: "NEET 2023 Paper & Detailed Solutions" },
       { year: "2022", title: "NEET 2022 Paper & Detailed Solutions" },
@@ -72,7 +76,7 @@ export default function PioneerAcademy() {
     ]
   };
 
-  const storeItems = [
+  const storeItems: CartItem[] = [
     { id: 1, title: "NEET 2024 All India Test Series", price: 2999, type: "Test Series" },
     { id: 2, title: "JEE Main Complete Study Material", price: 4500, type: "Study Material" },
     { id: 3, title: "Foundation (XI-XII) Question Bank", price: 1500, type: "Study Material" }
@@ -100,9 +104,6 @@ export default function PioneerAcademy() {
             <a href="#store" className="hover:text-[#f9d200] transition-colors">Test Series & Store</a>
           </div>
           <button onClick={() => setIsCartOpen(!isCartOpen)} className="bg-[#f9d200] text-[#162b66] px-4 py-2 rounded-md font-bold flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-            </svg>
             Cart ({cart.length})
           </button>
         </div>
@@ -111,7 +112,7 @@ export default function PioneerAcademy() {
       {/* Cart Modal */}
       {isCartOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end">
-          <div className="bg-white w-96 h-full p-6 shadow-2xl">
+          <div className="bg-white w-96 h-full p-6 shadow-2xl overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-[#162b66]">Your Cart</h2>
               <button onClick={() => setIsCartOpen(false)} className="text-gray-500 hover:text-black">✖</button>
@@ -226,7 +227,7 @@ export default function PioneerAcademy() {
           {features.map((feature, idx) => (
             <div key={idx} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center text-center hover:shadow-md transition-shadow">
               <div className="w-12 h-12 bg-[#00b4d8]/10 text-[#00b4d8] rounded-full flex items-center justify-center mb-4">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                <span className="font-bold text-xl">✓</span>
               </div>
               <h4 className="font-bold text-gray-800">{feature}</h4>
             </div>
