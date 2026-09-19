@@ -26,13 +26,15 @@ export default function Homepage() {
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
   const handleLeadSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setTimeout(() => {
       setSubmitStatus('Success! We will contact you shortly.');
       setFormData({ studentName: '', mobile: '', grade: '', batch: '' });
+      setIsSubmitting(false);
+    }, 1000);
+  };
       setIsSubmitting(false);
     }, 1000);
   };
