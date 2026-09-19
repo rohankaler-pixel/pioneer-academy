@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import Link from 'next/link';
 
 export default function Homepage() {
@@ -9,6 +9,19 @@ export default function Homepage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('');
+  const [academicYear, setAcademicYear] = useState('');
+
+  // Automatically calculate the academic year based on the June 1st rule
+  useEffect(() => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    // JavaScript months are 0-indexed (0 = Jan, 5 = June)
+    if (now.getMonth() >= 5) {
+      setAcademicYear(`${currentYear}-${(currentYear + 1).toString().slice(-2)}`);
+    } else {
+      setAcademicYear(`${currentYear - 1}-${currentYear.toString().slice(-2)}`);
+    }
+  }, []);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -51,7 +64,7 @@ export default function Homepage() {
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
             <div className="inline-block bg-white/10 text-[#f9d200] px-4 py-1 rounded-full text-sm font-bold tracking-wide border border-[#f9d200]/30">
-              Admissions Open 2024-25
+              Admissions Open {academicYear}
             </div>
             <h2 className="text-4xl md:text-6xl font-extrabold leading-tight">
               Realize Your IIT & NEET Dreams with Bikaner’s Premier Academy.
