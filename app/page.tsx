@@ -33,7 +33,7 @@ export default function Homepage() {
     setSubmitStatus('');
     
     // Replace this with the URL you copied from Google Apps Script
-    const GOOGLE_SHEET_WEBHOOK = "https://script.google.com/u/0/home/projects/1iB6EzCisM2zjx_ytoTbyVXt_tQ6Xaq6KWKmVLNc8eAHKsfA2X1uRStbF/edit";
+    const GOOGLE_SHEET_WEBHOOK = "https://script.google.com/macros/s/AKfycbwnYj4OD4L6w3gH0h-ANEMuQMYY-OcgIByIhx6EnK4lXTisRKMakdHgmhHKKHHYpOjQ0Q/exec";
     
     try {
       await fetch(GOOGLE_SHEET_WEBHOOK, {
