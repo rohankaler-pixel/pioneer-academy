@@ -26,17 +26,32 @@ export default function Homepage() {
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
   const handleLeadSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setTimeout(() => {
+    setSubmitStatus('');
+    
+    // Replace this with the URL you copied from Google Apps Script
+    const GOOGLE_SHEET_WEBHOOK = "https://script.google.com/u/0/home/projects/1iB6EzCisM2zjx_ytoTbyVXt_tQ6Xaq6KWKmVLNc8eAHKsfA2X1uRStbF/edit";
+    
+    try {
+      await fetch(GOOGLE_SHEET_WEBHOOK, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+      
       setSubmitStatus('Success! We will contact you shortly.');
       setFormData({ studentName: '', mobile: '', grade: '', batch: '' });
+    } catch (error) {
+      setSubmitStatus('An error occurred. Please check your connection and try again.');
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
-  };
-      setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   return (
