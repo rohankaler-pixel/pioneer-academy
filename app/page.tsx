@@ -137,8 +137,8 @@ export default function Homepage() {
                   </div>
                   <div className="text-center group">
                     <div className="w-24 h-24 rounded-full border-4 border-[#00b4d8] overflow-hidden mx-auto mb-3 shadow-lg group-hover:scale-105 transition-transform bg-gray-200">
-                      <Image src="/jai-vardhan.png" alt="Jai Vardhan Singh Rajvi" width={96} height={96} className="w-full h-full object-cover" />
-                    </div>
+                      <Image src="/jai-vardhan-singh-rajvi.png" alt="Jai Vardhan Singh Rajvi" width={96} height={96} className="w-full h-full object-cover" />
+                    </div>s
                     <div className="bg-[#162b66] text-white rounded-full px-3 py-1 text-xs font-bold mb-1 w-max mx-auto">95.59 PR</div>
                     <p className="font-black text-gray-900 text-lg leading-tight">Jai Vardhan<br/>Singh Rajvi</p>
                   </div>
