@@ -2,7 +2,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
 
-// 1. MASSIVE METADATA & LONG-TAIL KEYWORD MATRIX
 export const metadata: Metadata = {
   title: 'Pioneer Academy Bikaner | Best IIT JEE, NEET & Foundation Coaching',
   description: 'Bikaner\'s premier coaching institute for IIT JEE (Mains & Advanced), NEET-UG Medical preparation, and Class 9th-12th Foundation (CBSE/RBSE). Expert faculty, top AIR results, and small batches near Nathusar Gate.',
@@ -46,14 +45,17 @@ export const metadata: Metadata = {
     // Hindi / Hinglish Search Intent
     'Bikaner me sabse achi coaching', 'NEET ki taiyari Bikaner', 'IIT JEE preparation Bikaner', 'Bikaner best teachers for NEET', 'Medical coaching hindi medium Bikaner'
     // Founder / faculty recognition cluster — confirm exact name spelling,
+    'Girish Sharma Coaching', 'Narendra Shekhawat Coaching', 'Girish Sharma Sir' , 'Ashish Bissa Sir' , 'Jai Dhaiya Sir'
     // designation and subject taught before shipping; see note in
+    'Best Physics Teacher in Bikaner', 'Best Chemistry Teacher in Bikaner', 'Best Biology Teacher in Bikaner', 'Best Maths Teacher in Bikaner', 'Best NEET Teacher Bikaner', 'Best JEE Teacher Bikaner',
     // schema-markup.tsx Person entry.
     'Dr. Narendra Shekhawat Bikaner', 'Dr. Narendra Shekhawat Pioneer Academy',
     'Dr. Narendra Shekhawat coaching Bikaner', 'Narendra Shekhawat NEET faculty Bikaner',
     // Topper / results intent — pairs with the /results landing page
     'Bikaner JEE topper', 'Bikaner NEET topper', 'Bikaner top coaching institute',
     'Bikaner top rankers coaching', 'best results coaching Bikaner', 'JEE topper Bikaner Rajasthan',
-    'NEET topper Bikaner Rajasthan', 'coaching with best toppers Bikaner',  ].join(', '),
+    'NEET topper Bikaner Rajasthan', 'coaching with best toppers Bikaner',
+    ].join(', '),
   openGraph: {
     title: 'Pioneer Academy Bikaner | Top JEE & NEET Coaching',
     description: 'Engineer your future or path to top Medical colleges with Bikaner’s premier coaching institute. Comprehensive pedagogy and proven AIR results.',
@@ -106,7 +108,7 @@ export default function RootLayout({
           </span>
         </a>
 
-        {/* 2. MULTI-LAYERED JSON-LD SCHEMA FOR LOCAL SEO & RICH SNIPPETS */}
+        {/* SCHEMA MARKUP */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
