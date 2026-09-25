@@ -100,9 +100,9 @@ export default function Homepage() {
             <Link href="/programs/jee" className="hover:text-[#f9d200] transition-colors">JEE</Link>
             <Link href="/resources" className="hover:text-[#f9d200] transition-colors">Free Material</Link>
             <Link href="/pyq" className="hover:text-[#f9d200] transition-colors">PYQs</Link>
-            <button onClick={handleTestSeriesClick} className="bg-[#f9d200] text-[#162b66] px-4 py-2 rounded-md hover:bg-yellow-500 font-bold transition-colors">
+            <Link href="/test-series" className="bg-[#f9d200] text-[#162b66] px-4 py-2 rounded-md hover:bg-yellow-500 font-bold transition-colors">
               Test Series
-            </button>
+            </Link>
           </div>
 
           {/* Mobile Menu Toggle Button */}
@@ -127,9 +127,9 @@ export default function Homepage() {
             <Link href="/programs/jee" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#f9d200]">JEE</Link>
             <Link href="/resources" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#f9d200]">Free Material</Link>
             <Link href="/pyq" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#f9d200]">PYQs</Link>
-            <button onClick={handleTestSeriesClick} className="text-left bg-[#f9d200] text-[#162b66] px-4 py-3 rounded-md font-bold mt-2">
+            <Link href="/test-series" className="block text-center bg-[#f9d200] text-[#162b66] px-4 py-3 rounded-md font-bold mt-2">
               Book Test Series
-            </button>
+              </Link>
           </div>
         )}
       </nav>
