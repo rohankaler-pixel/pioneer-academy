@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 
@@ -44,7 +45,15 @@ export const metadata: Metadata = {
     'Coaching near Nathusar Gate Bikaner', 'Best coaching classes in Bikaner', 'Top 10 coaching in Bikaner', 'Bikaner coaching center fee', 'Best results in Bikaner coaching',
     // Hindi / Hinglish Search Intent
     'Bikaner me sabse achi coaching', 'NEET ki taiyari Bikaner', 'IIT JEE preparation Bikaner', 'Bikaner best teachers for NEET', 'Medical coaching hindi medium Bikaner'
-  ].join(', '),
+    // Founder / faculty recognition cluster — confirm exact name spelling,
+    // designation and subject taught before shipping; see note in
+    // schema-markup.tsx Person entry.
+    'Dr. Narendra Shekhawat Bikaner', 'Dr. Narendra Shekhawat Pioneer Academy',
+    'Dr. Narendra Shekhawat coaching Bikaner', 'Narendra Shekhawat NEET faculty Bikaner',
+    // Topper / results intent — pairs with the /results landing page
+    'Bikaner JEE topper', 'Bikaner NEET topper', 'Bikaner top coaching institute',
+    'Bikaner top rankers coaching', 'best results coaching Bikaner', 'JEE topper Bikaner Rajasthan',
+    'NEET topper Bikaner Rajasthan', 'coaching with best toppers Bikaner',  ].join(', '),
   openGraph: {
     title: 'Pioneer Academy Bikaner | Top JEE & NEET Coaching',
     description: 'Engineer your future or path to top Medical colleges with Bikaner’s premier coaching institute. Comprehensive pedagogy and proven AIR results.',
@@ -81,6 +90,22 @@ export default function RootLayout({
       <body>
         {children}
         
+        {/* FLOATING WHATSAPP BUTTON */}
+        <a
+          href="https://wa.me/918302224782?text=Hi,%20I%20would%20like%20to%20know%20more%20about%20admissions%20at%20Pioneer%20Academy%20Bikaner."
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Chat on WhatsApp"
+          className="fixed bottom-6 right-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform duration-300 flex items-center justify-center group"
+        >
+          <svg className="w-7 h-7 fill-current" viewBox="0 0 24 24">
+            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-2.972-1.49-4.925-2.671-6.891-6.082-.206-.352.206-.326.59-1.032.065-.124.033-.233-.016-.347-.049-.115-.57-1.374-.782-1.883-.206-.503-.415-.434-.57-.442-.149-.009-.32-.009-.49-.009s-.444.064-.678.324c-.234.26-1.002 1.016-1.002 2.477 0 1.461 1.028 2.873 1.171 3.069.143.196 2.025 3.1 4.902 4.343 2.877 1.243 2.877.829 3.402.776.525-.053 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+          </svg>
+          <span className="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs group-hover:ml-2 transition-all duration-300 ease-in-out font-bold text-sm">
+            Chat with Us
+          </span>
+        </a>
+
         {/* 2. MULTI-LAYERED JSON-LD SCHEMA FOR LOCAL SEO & RICH SNIPPETS */}
         <script
           type="application/ld+json"
