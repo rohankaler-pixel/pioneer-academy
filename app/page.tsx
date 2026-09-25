@@ -103,21 +103,23 @@ export default function Homepage() {
             <div className="grid md:grid-cols-2 gap-8">
               {/* NEET Achievers */}
               <div className="bg-gradient-to-b from-blue-50 to-white rounded-2xl p-6 border border-blue-100 shadow-md">
-                <h3 className="text-xl font-black text-[#162b66] mb-2">NEET Achievers</h3>
-                <p className="text-sm text-gray-500 font-bold mb-6">बीकानेर से NEET में एक और सफलता की उड़ान !</p>
-                <div className="flex justify-around items-end">
-                  <div className="text-center group">
-                    <div className="w-24 h-24 rounded-full border-4 border-[#f9d200] overflow-hidden mx-auto mb-3 shadow-lg group-hover:scale-105 transition-transform bg-gray-200">
+                <div className="text-center mb-6">
+                  <h3 className="text-xl font-black text-[#162b66] mb-2">NEET Achievers</h3>
+                  <p className="text-sm text-gray-500 font-bold">बीकानेर से NEET में एक और सफलता की उड़ान !</p>
+                </div>
+                <div className="flex justify-around items-start">
+                  <div className="text-center group flex flex-col items-center">
+                    <div className="w-24 h-24 rounded-full border-4 border-[#f9d200] overflow-hidden mb-3 shadow-lg group-hover:scale-105 transition-transform bg-gray-200">
                       <Image src="/urmila.png" alt="Urmila" width={96} height={96} className="w-full h-full object-cover" />
                     </div>
-                    <div className="bg-[#162b66] text-white rounded-full px-3 py-1 text-xs font-bold mb-1 w-max mx-auto">AIR 7231</div>
+                    <div className="bg-[#162b66] text-white rounded-full px-3 py-1 text-xs font-bold mb-1 w-max">AIR 7231</div>
                     <p className="font-black text-gray-900 text-lg">Urmila</p>
                   </div>
-                  <div className="text-center group">
-                    <div className="w-24 h-24 rounded-full border-4 border-[#f9d200] overflow-hidden mx-auto mb-3 shadow-lg group-hover:scale-105 transition-transform bg-gray-200">
+                  <div className="text-center group flex flex-col items-center">
+                    <div className="w-24 h-24 rounded-full border-4 border-[#f9d200] overflow-hidden mb-3 shadow-lg group-hover:scale-105 transition-transform bg-gray-200">
                       <Image src="/kanishka.png" alt="Kanishka" width={96} height={96} className="w-full h-full object-cover" />
                     </div>
-                    <div className="bg-[#162b66] text-white rounded-full px-3 py-1 text-xs font-bold mb-1 w-max mx-auto">AIR 4771</div>
+                    <div className="bg-[#162b66] text-white rounded-full px-3 py-1 text-xs font-bold mb-1 w-max">AIR 4771</div>
                     <p className="font-black text-gray-900 text-lg">Kanishka</p>
                   </div>
                 </div>
@@ -125,21 +127,23 @@ export default function Homepage() {
 
               {/* JEE Achievers */}
               <div className="bg-gradient-to-b from-blue-50 to-white rounded-2xl p-6 border border-blue-100 shadow-md">
-                <h3 className="text-xl font-black text-[#162b66] mb-2">JEE Achievers</h3>
-                <p className="text-sm text-gray-500 font-bold mb-6">Engineered for Excellence !</p>
-                <div className="flex justify-around items-end">
-                  <div className="text-center group">
-                    <div className="w-24 h-24 rounded-full border-4 border-[#00b4d8] overflow-hidden mx-auto mb-3 shadow-lg group-hover:scale-105 transition-transform bg-gray-200">
+                <div className="text-center mb-6">
+                  <h3 className="text-xl font-black text-[#162b66] mb-2">JEE Achievers</h3>
+                  <p className="text-sm text-gray-500 font-bold">Engineered for Excellence !</p>
+                </div>
+                <div className="flex justify-around items-start">
+                  <div className="text-center group flex flex-col items-center">
+                    <div className="w-24 h-24 rounded-full border-4 border-[#00b4d8] overflow-hidden mb-3 shadow-lg group-hover:scale-105 transition-transform bg-gray-200">
                       <Image src="/rahan.png" alt="Rahan" width={96} height={96} className="w-full h-full object-cover" />
                     </div>
-                    <div className="bg-[#162b66] text-white rounded-full px-3 py-1 text-xs font-bold mb-1 w-max mx-auto">97.29 PR</div>
+                    <div className="bg-[#162b66] text-white rounded-full px-3 py-1 text-xs font-bold mb-1 w-max">97.29 PR</div>
                     <p className="font-black text-gray-900 text-lg">Rahan</p>
                   </div>
-                  <div className="text-center group">
-                    <div className="w-24 h-24 rounded-full border-4 border-[#00b4d8] overflow-hidden mx-auto mb-3 shadow-lg group-hover:scale-105 transition-transform bg-gray-200">
+                  <div className="text-center group flex flex-col items-center">
+                    <div className="w-24 h-24 rounded-full border-4 border-[#00b4d8] overflow-hidden mb-3 shadow-lg group-hover:scale-105 transition-transform bg-gray-200">
                       <Image src="/jai-vardhan-singh-rajvi.png" alt="Jai Vardhan Singh Rajvi" width={96} height={96} className="w-full h-full object-cover" />
-                    </div>s
-                    <div className="bg-[#162b66] text-white rounded-full px-3 py-1 text-xs font-bold mb-1 w-max mx-auto">95.59 PR</div>
+                    </div>
+                    <div className="bg-[#162b66] text-white rounded-full px-3 py-1 text-xs font-bold mb-1 w-max">95.59 PR</div>
                     <p className="font-black text-gray-900 text-lg leading-tight">Jai Vardhan<br/>Singh Rajvi</p>
                   </div>
                 </div>
