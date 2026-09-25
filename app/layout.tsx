@@ -6,6 +6,32 @@ export const metadata: Metadata = {
   title: 'Pioneer Academy Bikaner | Best IIT JEE, NEET & Foundation Coaching',
   description: 'Bikaner\'s premier coaching institute for IIT JEE (Mains & Advanced), NEET-UG Medical preparation, and Class 9th-12th Foundation (CBSE/RBSE). Expert faculty, top AIR results, and small batches near Nathusar Gate.',
   keywords: [
+    // Brand
+    'Pioneer Academy Bikaner', 'Pioneer Coaching Bikaner', 'Pioneer Institute Bikaner', 'Pioneer Academy Nathusar Gate',
+    // NEET / Medical cluster
+    'NEET coaching Bikaner', 'best NEET coaching in Bikaner', 'NEET UG preparation Bikaner', 'medical entrance coaching Bikaner',
+    'top medical coaching Rajasthan', 'NEET dropper batch Bikaner', 'NEET repeater batch', 'biology coaching Bikaner',
+    'AIIMS preparation Bikaner', 'NEET target batch Bikaner', 'NEET crash course Bikaner', 'NEET online + offline coaching Bikaner',
+    'best biology teacher Bikaner', 'NEET result Bikaner coaching',
+    // JEE / Engineering cluster
+    'IIT JEE coaching in Bikaner', 'best IIT coaching Bikaner', 'JEE Mains and Advanced coaching Bikaner',
+    'best engineering entrance coaching Bikaner', 'JEE dropper batch Bikaner', 'physics chemistry maths coaching Bikaner',
+    'top IIT coaching Rajasthan', 'JEE test series Bikaner', 'JEE crash course Bikaner', 'IIT foundation batch Bikaner',
+    // Foundation / School / Board cluster
+    'foundation classes 9th 10th Bikaner', 'class 11 12 coaching Bikaner', 'CBSE board exam preparation Bikaner',
+    'RBSE board coaching Bikaner', 'NTSE preparation Bikaner', 'olympiad coaching Bikaner', 'best science tuition Bikaner',
+    'class 9 foundation course Bikaner', 'class 10 foundation course Bikaner', 'school + competitive exam coaching Bikaner',
+    // Results / trust intent
+    'Bikaner coaching institute results', 'AIR results Bikaner coaching', 'top rankers Bikaner NEET JEE',
+    'coaching institute with best results Bikaner', 'toppers coaching Bikaner',
+    // Local / commercial intent
+    'coaching near Nathusar Gate Bikaner', 'best coaching classes in Bikaner', 'top 10 coaching institutes Bikaner',
+    'Bikaner coaching center fees', 'coaching institute admission Bikaner', 'coaching institute near me Bikaner',
+    'best coaching institute Rajasthan', 'Bikaner tuition center JEE NEET',
+    // Hindi / Hinglish intent
+    'Bikaner me sabse achi coaching', 'NEET ki taiyari Bikaner', 'IIT JEE ki taiyari Bikaner',
+    'Bikaner best teachers NEET', 'medical coaching hindi medium Bikaner', 'coaching institute Bikaner fees details',
+    'Bikaner ka best coaching center',
     // Core Institutional Keywords
     'Pioneer Academy Bikaner', 'Pioneer Coaching Bikaner', 'Pioneer Institute',
     // Medical / NEET Cluster
