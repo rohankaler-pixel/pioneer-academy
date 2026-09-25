@@ -11,6 +11,7 @@ export default function Homepage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('');
   const [academicYear, setAcademicYear] = useState('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Automatically calculate the academic year based on the June 1st rule
   useEffect(() => {
@@ -24,7 +25,21 @@ export default function Homepage() {
   }, []);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === 'grade') {
+      // Reset the batch when the grade changes so they don't submit an invalid combination
+      setFormData({ ...formData, grade: value, batch: '' });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
+  const handleTestSeriesClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // Pre-fill the batch as Test Series and scroll to the form
+    setFormData(prev => ({ ...prev, batch: 'Test_Series' }));
+    document.getElementById('counseling-form')?.scrollIntoView({ behavior: 'smooth' });
+    setIsMobileMenuOpen(false);
   };
 
   const handleLeadSubmit = async (e: FormEvent) => {
@@ -69,23 +84,54 @@ export default function Homepage() {
       </div>
 
       {/* Navigation */}
-      <nav className="bg-[#162b66] text-white p-4 sticky top-0 z-50 shadow-md">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
+      <nav className="bg-[#162b66] text-white sticky top-0 z-50 shadow-md">
+        <div className="max-w-7xl mx-auto p-4 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-10 h-10 bg-[#f9d200] text-[#162b66] rounded-full flex items-center justify-center font-bold text-xl italic">π</div>
             <div>
-              <h1 className="font-bold text-2xl tracking-wider text-[#00b4d8]">PIONEER</h1>
-              <p className="text-xs text-[#f9d200] font-semibold tracking-widest uppercase">Academy</p>
+              <h1 className="font-bold text-2xl tracking-wider text-[#00b4d8] leading-none">PIONEER</h1>
+              <p className="text-[10px] text-[#f9d200] font-bold tracking-[0.2em] uppercase leading-tight">Academy</p>
             </div>
           </Link>
+          
+          {/* Desktop Menu */}
           <div className="hidden md:flex gap-6 font-medium items-center">
             <Link href="/programs/neet" className="hover:text-[#f9d200] transition-colors">NEET</Link>
             <Link href="/programs/jee" className="hover:text-[#f9d200] transition-colors">JEE</Link>
             <Link href="/resources" className="hover:text-[#f9d200] transition-colors">Free Material</Link>
             <Link href="/pyq" className="hover:text-[#f9d200] transition-colors">PYQs</Link>
-            <Link href="/test-series" className="bg-[#f9d200] text-[#162b66] px-4 py-2 rounded-md hover:bg-yellow-500 font-bold transition-colors">Test Series</Link>
+            <button onClick={handleTestSeriesClick} className="bg-[#f9d200] text-[#162b66] px-4 py-2 rounded-md hover:bg-yellow-500 font-bold transition-colors">
+              Test Series
+            </button>
           </div>
+
+          {/* Mobile Menu Toggle Button */}
+          <button 
+            className="md:hidden text-white focus:outline-none p-2" 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {isMobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
         </div>
+
+        {/* Mobile Dropdown Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-[#0d1a40] border-t border-blue-900 px-4 py-6 flex flex-col gap-6 font-medium text-lg shadow-inner">
+            <Link href="/programs/neet" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#f9d200]">NEET</Link>
+            <Link href="/programs/jee" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#f9d200]">JEE</Link>
+            <Link href="/resources" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#f9d200]">Free Material</Link>
+            <Link href="/pyq" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#f9d200]">PYQs</Link>
+            <button onClick={handleTestSeriesClick} className="text-left bg-[#f9d200] text-[#162b66] px-4 py-3 rounded-md font-bold mt-2">
+              Book Test Series
+            </button>
+          </div>
+        )}
       </nav>
 
       {/* Wall of Fame Banner */}
@@ -184,8 +230,8 @@ export default function Homepage() {
         </div>
       </section>
 
-      {/* 1. Hero Section */}
-      <section className="bg-gradient-to-br from-[#162b66] to-[#0d1a40] text-white pt-16 pb-24 px-4">
+      {/* 1. Hero Section (Added ID for scrolling) */}
+      <section id="counseling-form" className="bg-gradient-to-br from-[#162b66] to-[#0d1a40] text-white pt-16 pb-24 px-4">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
             <div className="inline-block bg-white/10 text-[#f9d200] px-4 py-1 rounded-full text-sm font-bold tracking-wide border border-[#f9d200]/30">
@@ -231,13 +277,34 @@ export default function Homepage() {
                   <label className="block text-sm font-bold text-gray-700 mb-1">Target Batch</label>
                   <select name="batch" required value={formData.batch} onChange={handleInputChange} className="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 focus:ring-2 focus:ring-[#162b66] outline-none text-sm">
                     <option value="">Select</option>
-                    <option value="Foundation">Foundation (9/10)</option>
-                    <option value="JEE_2_Year">JEE 2 Year (11/12)</option>
-                    <option value="JEE_1_Year">JEE 1 Year (12)</option>
-                    <option value="JEE_Target">JEE Target</option>
-                    <option value="NEET_2_Year">NEET 2 Year (11/12)</option>
-                    <option value="NEET_1_Year">NEET 1 Year (12)</option>
-                    <option value="NEET_Target">NEET Target</option>
+                    
+                    {/* Dynamic Batch Options based on Grade */}
+                    {(formData.grade === '9th' || formData.grade === '10th') && (
+                      <option value="Foundation">Foundation (9/10)</option>
+                    )}
+                    {formData.grade === '11th' && (
+                      <>
+                        <option value="JEE_2_Year">JEE 2 Year</option>
+                        <option value="NEET_2_Year">NEET 2 Year</option>
+                      </>
+                    )}
+                    {formData.grade === '12th' && (
+                      <>
+                        <option value="JEE_1_Year">JEE 1 Year</option>
+                        <option value="NEET_1_Year">NEET 1 Year</option>
+                      </>
+                    )}
+                    {formData.grade === 'Dropper' && (
+                      <>
+                        <option value="JEE_Target">JEE Target</option>
+                        <option value="NEET_Target">NEET Target</option>
+                      </>
+                    )}
+                    
+                    {/* Persist Test Series if selected via button, regardless of grade */}
+                    {formData.batch === 'Test_Series' && (
+                      <option value="Test_Series">Test Series</option>
+                    )}
                   </select>
                 </div>
               </div>
@@ -272,48 +339,50 @@ export default function Homepage() {
         </div>
       </section>
 
-      {/* 3. Leadership & Vision */}
+      {/* 3. Leadership & Vision (Completely Redesigned) */}
       <section className="py-20 px-4 bg-gray-100">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-[#162b66] mb-4">Guided by Visionaries</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto text-lg">Pioneer Academy is led by educators who understand what it takes to win at the highest academic levels.</p>
+            <p className="text-gray-600 max-w-2xl mx-auto text-lg">Pioneer Academy is led by educators with a collective experience of over 40 years, tailored specifically to bring top-tier competitive coaching to the students of Bikaner.</p>
             <div className="w-24 h-1.5 bg-[#f9d200] mx-auto rounded-full mt-6"></div>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white rounded-2xl p-8 shadow-md flex gap-6 items-start border-l-4 border-[#162b66]">
-              <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0 border-2 border-[#162b66] relative bg-gray-200">
-                <Image
-                  src="/narendra-shekhawat.png"
-                  alt="Dr. Narendra Shekhawat"
-                  width={96}
-                  height={96}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold text-gray-900">Dr. Narendra Shekhawat</h3>
-                <p className="text-[#00b4d8] font-bold mb-3">Founder / Director</p>
-                <p className="text-gray-600 text-sm leading-relaxed">Renowned for his educational philosophy and absolute dedication to bringing top-tier, structured competitive coaching to the students of Bikaner.</p>
-              </div>
+          {/* Highlight: Patron / Mentor */}
+          <div className="bg-white rounded-3xl p-8 md:p-10 shadow-lg border-t-8 border-[#162b66] max-w-3xl mx-auto mb-16 flex flex-col md:flex-row gap-8 items-center md:items-start text-center md:text-left">
+            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden flex-shrink-0 border-4 border-[#f9d200] shadow-md bg-gray-200">
+              <Image
+                src="/narendra-shekhawat.png"
+                alt="Dr. Narendra Shekhawat"
+                width={160}
+                height={160}
+                className="w-full h-full object-cover"
+              />
             </div>
-            <div className="bg-white rounded-2xl p-8 shadow-md flex gap-6 items-start border-l-4 border-[#162b66]">
-              <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0 border-2 border-[#162b66] relative bg-gray-200">
-                <Image
-                  src="/girish-sharma.png"
-                  alt="Mr. Girish Sharma"
-                  width={96}
-                  height={96}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold text-gray-900">Mr. Girish Sharma</h3>
-                <p className="text-[#00b4d8] font-bold mb-3">Founder / Director</p>
-                <p className="text-gray-600 text-sm leading-relaxed">With 28 years of mentoring experience, bringing unmatched expertise in physics and a clear vision for student success in national-level exams.</p>
-              </div>
+            <div>
+              <h3 className="text-3xl font-black text-gray-900 mb-1">Dr. Narendra Shekhawat</h3>
+              <p className="text-[#00b4d8] font-black text-lg mb-4 uppercase tracking-wide">Patron / Mentor</p>
+              <p className="text-gray-600 leading-relaxed text-base">Renowned for his educational philosophy and absolute dedication to bringing top-tier, structured competitive coaching to the students of Bikaner. His vision shapes the pedagogical excellence at Pioneer Academy.</p>
             </div>
+          </div>
+
+          {/* HODs Grid */}
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-black text-[#162b66]">Heads of Department</h3>
+            <p className="text-sm text-gray-500 font-bold mt-2">Decades of combined expertise</p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { name: "Mr. Girish Sharma", role: "HOD Physics" },
+              { name: "Mr. Sumit Yogi", role: "HOD Biology" },
+              { name: "Mr. Ashish Bissa", role: "HOD Mathematics" },
+              { name: "Mr. Jai Dhaiya", role: "HOD Chemistry" }
+            ].map((hod, idx) => (
+              <div key={idx} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center hover:border-[#00b4d8] hover:shadow-md transition-all">
+                <h4 className="text-lg font-black text-gray-900 mb-1">{hod.name}</h4>
+                <p className="text-sm font-bold text-[#00b4d8]">{hod.role}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
