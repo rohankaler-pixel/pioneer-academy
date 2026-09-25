@@ -328,7 +328,7 @@ export default function Homepage() {
           {[
             { title: "NEET Coaching", tag: "Your Path to Top Medical Colleges.", desc: "Intensive curriculum covering Physics, Chemistry, and Biology. Focused on speed, accuracy, and NCERT mastery.", link: "/programs/neet" },
             { title: "IIT-JEE Coaching", tag: "Engineer Your Future.", desc: "Rigorous preparation for JEE Main & Advanced. Heavy focus on problem-solving, advanced mathematics, and conceptual applications.", link: "/programs/jee" },
-            { title: "Foundation (9th & 10th) + NEET / JEE", tag: "School Prep", desc: "Focus on improving marks in school exams for 9th and 10th with the backdrop of early preparation for Medical or Engineering.", link: "#" }
+            { title: "Foundation (9th & 10th) + NEET / JEE", tag: "School Prep", desc: "Focus on improving marks in school exams for 9th and 10th with the backdrop of early preparation for Medical or Engineering.", link: "/programs/foundation" }
           ].map((prog, idx) => (
             <div key={idx} className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm flex flex-col hover:shadow-xl transition-shadow">
               <h3 className="text-2xl font-black text-[#162b66] mb-2">{prog.title}</h3>
