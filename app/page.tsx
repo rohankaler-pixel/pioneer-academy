@@ -1,5 +1,5 @@
 "use client";
-
+import Image from 'next/image';
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import Link from 'next/link';
 
@@ -164,7 +164,7 @@ export default function Homepage() {
         </div>
       </section>
 
-      {/* 3. Leadership & Vision */}
+{/* 3. Leadership & Vision */}
       <section className="py-20 px-4 bg-gray-100">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
@@ -175,7 +175,15 @@ export default function Homepage() {
           
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-white rounded-2xl p-8 shadow-md flex gap-6 items-start border-l-4 border-[#162b66]">
-              <div className="w-24 h-24 bg-gray-200 rounded-full flex-shrink-0"></div>
+              <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0 border-2 border-[#162b66] relative">
+                <Image
+                  src="/narendra-shekhawat.png"
+                  alt="Dr. Narendra Shekhawat"
+                  width={96}
+                  height={96}
+                  className="w-full h-full object-cover"
+                />
+              </div>
               <div>
                 <h3 className="text-2xl font-bold text-gray-900">Dr. Narendra Shekhawat</h3>
                 <p className="text-[#00b4d8] font-bold mb-3">Founder / Director</p>
@@ -183,7 +191,15 @@ export default function Homepage() {
               </div>
             </div>
             <div className="bg-white rounded-2xl p-8 shadow-md flex gap-6 items-start border-l-4 border-[#162b66]">
-              <div className="w-24 h-24 bg-gray-200 rounded-full flex-shrink-0"></div>
+              <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0 border-2 border-[#162b66] relative">
+                <Image
+                  src="/girish-sharma.png"
+                  alt="Mr. Girish Sharma"
+                  width={96}
+                  height={96}
+                  className="w-full h-full object-cover"
+                />
+              </div>
               <div>
                 <h3 className="text-2xl font-bold text-gray-900">Mr. Girish Sharma</h3>
                 <p className="text-[#00b4d8] font-bold mb-3">Founder / Director</p>
@@ -193,6 +209,7 @@ export default function Homepage() {
           </div>
         </div>
       </section>
+
 
       {/* 4. Our Programs */}
       <section id="programs" className="py-20 px-4 max-w-7xl mx-auto">
