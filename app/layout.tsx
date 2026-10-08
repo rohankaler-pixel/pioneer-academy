@@ -1,30 +1,13 @@
-import type { Metadata } from 'next';
-import './globals.css';
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-<head>
-  <Script
-    async
-    src="https://www.googletagmanager.com/gtag/js?id=AW-18474173107"
-    strategy="afterInteractive"
-  />
-  <Script id="google-analytics" strategy="afterInteractive">
-    {`
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'AW-18474173107');
-    `}
-  </Script>
-</head>
 import Script from "next/script";
 
-// Keep your existing metadata right here (do not duplicate it below)
+const inter = Inter({ subsets: ["latin"] });
+
 export const metadata: Metadata = {
   title: 'Pioneer Academy Bikaner | Best IIT JEE, NEET & Foundation Coaching',
-  description: 'Bikaner\'s premier coaching institute for IIT JEE (Mains & Advanced), NEET...',
-  // ... rest of your existing metadata fields
+  description: 'Bikaner\'s premier coaching institute for IIT JEE (Mains & Advanced), NEET, and Foundation batches. Join our expert-led classes and achieve top ranks.',
 };
 
 export default function RootLayout({
@@ -54,6 +37,7 @@ export default function RootLayout({
     </html>
   );
 }
+
 export const metadata: Metadata = {
   title: 'Pioneer Academy Bikaner | Best IIT JEE, NEET & Foundation Coaching',
   description: 'Bikaner\'s premier coaching institute for IIT JEE (Mains & Advanced), NEET-UG Medical preparation, and Class 9th-12th Foundation (CBSE/RBSE). Expert faculty, top AIR results, and small batches near Nathusar Gate.',
