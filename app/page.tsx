@@ -85,9 +85,9 @@ export default function Homepage() {
 
       {/* Navigation */}
       <nav className="bg-[#162b66] text-white sticky top-0 z-50 shadow-md">
-        <div className="max-w-7xl mx-auto p-4 flex justify-between items-center">
+        <div className="max-w-7xl mx-auto py-2 px-4 flex justify-between items-center">
           <Link href="/" className="flex items-center">
-            <Image src="/logo.png" alt="Pioneer Academy Bikaner" width={200} height={60} className="object-contain" priority />
+            <Image src="/logo.png" alt="Pioneer Academy Bikaner" width={150} height={45} className="object-contain" priority />
           </Link>
           
           {/* Desktop Menu */}
@@ -406,11 +406,11 @@ export default function Homepage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#0d1a40] text-gray-300 py-12 px-4 border-t-4 border-[#f9d200] mt-auto">
+      <footer className="bg-[#0d1a40] text-gray-300 py-8 px-4 border-t-4 border-[#f9d200] mt-auto">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 items-center">
           <div>
             <div className="mb-4">
-              <Image src="/logo.png" alt="Pioneer Academy" width={180} height={50} className="object-contain" />
+              <Image src="/logo.png" alt="Pioneer Academy" width={150} height={45} className="object-contain" />
             </div>
             <p className="text-sm text-gray-400">Bikaner&apos;s premier coaching institute for JEE Main, Advanced, NEET, and Foundation preparation.</p>
           </div>
