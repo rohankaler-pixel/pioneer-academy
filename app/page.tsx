@@ -13,6 +13,8 @@ export default function Homepage() {
   const [academicYear, setAcademicYear] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+
+  
   // Automatically calculate the academic year based on the June 1st rule
   useEffect(() => {
     const now = new Date();
