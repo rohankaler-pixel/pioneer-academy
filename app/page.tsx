@@ -4,6 +4,13 @@ import Image from 'next/image';
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import Link from 'next/link';
 
+// Declare global window property for Google Ads gtag support
+declare global {
+  interface Window {
+    gtag: (...args: any[]) => void;
+  }
+}
+
 export default function Homepage() {
   const [formData, setFormData] = useState({
     studentName: '', mobile: '', grade: '', batch: ''
@@ -44,6 +51,23 @@ export default function Homepage() {
     setIsMobileMenuOpen(false);
   };
 
+  // Google Ads Conversion Tracker Function
+  const reportConversion = (url?: string) => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'conversion', {
+        'send_to': 'AW-18474173107/gxPECLHUwJUdELOFlulE',
+        'value': 1.0,
+        'currency': 'INR',
+        'event_callback': () => {
+          if (url) {
+            window.location.href = url;
+          }
+        }
+      });
+    }
+    return false;
+  };
+
   const handleLeadSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -52,6 +76,10 @@ export default function Homepage() {
     const GOOGLE_SHEET_WEBHOOK = "https://script.google.com/macros/s/AKfycbwnYj4OD4L6w3gH0h-ANEMuQMYY-OcgIByIhx6EnK4lXTisRKMakdHgmhHKKHHYpOjQ0Q/exec";
     
     try {
+      // 1. Trigger Google Ads conversion tracking pixel
+      reportConversion();
+
+      // 2. Submit data to Google Sheet webhook
       await fetch(GOOGLE_SHEET_WEBHOOK, {
         method: 'POST',
         mode: 'no-cors',
@@ -98,7 +126,7 @@ export default function Homepage() {
             <Link href="/programs/jee" className="hover:text-[#f9d200] transition-colors">JEE</Link>
             <Link href="/resources" className="hover:text-[#f9d200] transition-colors">Free Material</Link>
             <Link href="/pyq" className="hover:text-[#f9d200] transition-colors">PYQs</Link>
-            <Link href="/test-series" className="bg-[#f9d200] text-[#162b66] px-4 py-2 rounded-md hover:bg-yellow-500 font-bold transition-colors">
+            <Link href="/test-series" onClick={handleTestSeriesClick} className="bg-[#f9d200] text-[#162b66] px-4 py-2 rounded-md hover:bg-yellow-500 font-bold transition-colors">
               Test Series
             </Link>
           </div>
@@ -125,7 +153,7 @@ export default function Homepage() {
             <Link href="/programs/jee" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#f9d200]">JEE</Link>
             <Link href="/resources" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#f9d200]">Free Material</Link>
             <Link href="/pyq" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#f9d200]">PYQs</Link>
-            <Link href="/test-series" className="block text-center bg-[#f9d200] text-[#162b66] px-4 py-3 rounded-md font-bold mt-2">
+            <Link href="/test-series" onClick={handleTestSeriesClick} className="block text-center bg-[#f9d200] text-[#162b66] px-4 py-3 rounded-md font-bold mt-2">
               Book Test Series
               </Link>
           </div>
