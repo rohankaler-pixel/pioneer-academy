@@ -3,13 +3,13 @@ import './globals.css';
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Script from "next/script"; // 1. Import the Script component
+import Script from "next/script";
 
-const inter = Inter({ subsets: ["latin"] });
-
+// Keep your existing metadata right here (do not duplicate it below)
 export const metadata: Metadata = {
-  title: "Pioneer Academy Bikaner",
-  description: "Bikaner's Premier Institute for NEET, JEE & Foundation",
+  title: 'Pioneer Academy Bikaner | Best IIT JEE, NEET & Foundation Coaching',
+  description: 'Bikaner\'s premier coaching institute for IIT JEE (Mains & Advanced), NEET...',
+  // ... rest of your existing metadata fields
 };
 
 export default function RootLayout({
@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* 2. Add Google tag (gtag.js) here */}
+        {/* Google Ads Tag */}
         <Script
           async
           src="https://www.googletagmanager.com/gtag/js?id=AW-18474173107"
@@ -39,7 +39,6 @@ export default function RootLayout({
     </html>
   );
 }
-
 export const metadata: Metadata = {
   title: 'Pioneer Academy Bikaner | Best IIT JEE, NEET & Foundation Coaching',
   description: 'Bikaner\'s premier coaching institute for IIT JEE (Mains & Advanced), NEET-UG Medical preparation, and Class 9th-12th Foundation (CBSE/RBSE). Expert faculty, top AIR results, and small batches near Nathusar Gate.',
