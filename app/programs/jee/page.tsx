@@ -7,7 +7,7 @@ export default function JEEProgram() {
       <nav className="bg-[#162b66] text-white p-4">
         <div className="max-w-7xl mx-auto flex justify-between">
           <Link href="/" className="font-bold text-xl text-[#00b4d8]">PIONEER <span className="text-white font-light">| Programs</span></Link>
-          <Link href="/#register" className="bg-[#f9d200] text-[#162b66] px-4 py-1 rounded font-bold">Apply Now</Link>
+          <Link href="/#counseling-form" className="bg-[#f9d200] text-[#162b66] px-4 py-1 rounded font-bold">Apply Now</Link>
         </div>
       </nav>
 
