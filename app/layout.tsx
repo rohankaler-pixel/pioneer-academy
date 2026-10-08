@@ -3,6 +3,21 @@ import './globals.css';
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+<head>
+  <Script
+    async
+    src="https://www.googletagmanager.com/gtag/js?id=AW-18474173107"
+    strategy="afterInteractive"
+  />
+  <Script id="google-analytics" strategy="afterInteractive">
+    {`
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'AW-18474173107');
+    `}
+  </Script>
+</head>
 import Script from "next/script";
 
 // Keep your existing metadata right here (do not duplicate it below)
