@@ -1,5 +1,44 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import Script from "next/script"; // 1. Import the Script component
+
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "Pioneer Academy Bikaner",
+  description: "Bikaner's Premier Institute for NEET, JEE & Foundation",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <head>
+        {/* 2. Add Google tag (gtag.js) here */}
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=AW-18474173107"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'AW-18474173107');
+          `}
+        </Script>
+      </head>
+      <body className={inter.className}>{children}</body>
+    </html>
+  );
+}
 
 export const metadata: Metadata = {
   title: 'Pioneer Academy Bikaner | Best IIT JEE, NEET & Foundation Coaching',
