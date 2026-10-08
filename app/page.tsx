@@ -86,9 +86,9 @@ export default function Homepage() {
       {/* Navigation */}
       <nav className="bg-[#162b66] text-white sticky top-0 z-50 shadow-md h-16 flex items-center">
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center w-full">
-          <Link href="/" className="flex items-center">
-            <Image src="/logo.png" alt="Pioneer Academy Bikaner" width={160} height={40} className="h-10 w-auto object-contain" priority />
-          </Link>
+          <div className="mb-4">
+              <Image src="/logo.png" alt="Pioneer Academy" width={240} height={50} className="h-14 w-auto object-contain" />
+            </div>
           
           {/* Desktop Menu */}
           <div className="hidden md:flex gap-6 font-medium items-center">
