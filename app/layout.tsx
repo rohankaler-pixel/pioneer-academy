@@ -7,39 +7,6 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: 'Pioneer Academy Bikaner | Best IIT JEE, NEET & Foundation Coaching',
-  description: 'Bikaner\'s premier coaching institute for IIT JEE (Mains & Advanced), NEET, and Foundation batches. Join our expert-led classes and achieve top ranks.',
-};
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en">
-      <head>
-        {/* Google Ads Tag */}
-        <Script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=AW-18474173107"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'AW-18474173107');
-          `}
-        </Script>
-      </head>
-      <body className={inter.className}>{children}</body>
-    </html>
-  );
-}
-
-export const metadata: Metadata = {
-  title: 'Pioneer Academy Bikaner | Best IIT JEE, NEET & Foundation Coaching',
   description: 'Bikaner\'s premier coaching institute for IIT JEE (Mains & Advanced), NEET-UG Medical preparation, and Class 9th-12th Foundation (CBSE/RBSE). Expert faculty, top AIR results, and small batches near Nathusar Gate.',
   keywords: [
     // Brand
@@ -123,6 +90,22 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth">
+      <head>
+        {/* Google Ads Tag */}
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=AW-18474173107"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'AW-18474173107');
+          `}
+        </Script>
+      </head>
       <body>
         {children}
         
