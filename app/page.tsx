@@ -86,12 +86,8 @@ export default function Homepage() {
       {/* Navigation */}
       <nav className="bg-[#162b66] text-white sticky top-0 z-50 shadow-md">
         <div className="max-w-7xl mx-auto p-4 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-[#f9d200] text-[#162b66] rounded-full flex items-center justify-center font-bold text-xl italic">π</div>
-            <div>
-              <h1 className="font-bold text-2xl tracking-wider text-[#00b4d8] leading-none">PIONEER</h1>
-              <p className="text-[10px] text-[#f9d200] font-bold tracking-[0.2em] uppercase leading-tight">Academy</p>
-            </div>
+          <Link href="/" className="flex items-center">
+            <Image src="/logo.png" alt="Pioneer Academy Bikaner" width={200} height={60} className="object-contain" priority />
           </Link>
           
           {/* Desktop Menu */}
@@ -413,9 +409,8 @@ export default function Homepage() {
       <footer className="bg-[#0d1a40] text-gray-300 py-12 px-4 border-t-4 border-[#f9d200] mt-auto">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 items-center">
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-[#f9d200] text-[#162b66] rounded-full flex items-center justify-center font-bold text-lg italic">π</div>
-              <h2 className="font-bold text-2xl tracking-wider text-[#00b4d8]">PIONEER <span className="text-[#f9d200]">ACADEMY</span></h2>
+            <div className="mb-4">
+              <Image src="/logo.png" alt="Pioneer Academy" width={180} height={50} className="object-contain" />
             </div>
             <p className="text-sm text-gray-400">Bikaner&apos;s premier coaching institute for JEE Main, Advanced, NEET, and Foundation preparation.</p>
           </div>
