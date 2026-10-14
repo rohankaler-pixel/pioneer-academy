@@ -45,30 +45,16 @@ const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
 
 
-// Automatically calculate the academic year based on the June 1st rule
-
-useEffect(() => {
-
-const now = new Date();
-
-const currentYear = now.getFullYear();
-if (now.getMonth() >= 5) {
-  setAcademicYear(`${currentYear}-${(currentYear + 1).toString().slice(-2)}`);
-} else {
-  setAcademicYear(`${currentYear - 1}-${currentYear.toString().slice(-2)}`);
-}
-
-} else {
-
-setAcademicYear(`${currentYear
-1}-${currentYear.toString().slice(-2)}`);
-
-}
-
-}, []);
-
-
-
+/// Automatically calculate the academic year based on the June 1st rule
+  useEffect(() => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    if (now.getMonth() >= 5) {
+      setAcademicYear(`${currentYear}-${(currentYear + 1).toString().slice(-2)}`);
+    } else {
+      setAcademicYear(`${currentYear - 1}-${currentYear.toString().slice(-2)}`);
+    }
+  }, []);
 const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 
 const { name, value } = e.target;
