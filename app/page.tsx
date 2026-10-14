@@ -20,6 +20,40 @@ export default function Homepage() {
   const [academicYear, setAcademicYear] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import { Analytics } from "@vercel/analytics/next"; // 1. Import Analytics
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "Pioneer Academy - Bikaner",
+  description: "Bikaner's premier coaching institute for JEE Main, Advanced, NEET, and Foundation preparation.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {children}
+        <Analytics /> {/* 2. Add Analytics component here */}
+      </body>
+    </html>
+  );
+}
 
   
   // Automatically calculate the academic year based on the June 1st rule
