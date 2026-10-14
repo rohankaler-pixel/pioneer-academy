@@ -52,10 +52,11 @@ useEffect(() => {
 const now = new Date();
 
 const currentYear = now.getFullYear();
-
 if (now.getMonth() >= 5) {
-
-setAcademicYear(`${currentYear}-${(currentYear + 1).toString().slice(-2)}`);
+  setAcademicYear(`${currentYear}-${(currentYear + 1).toString().slice(-2)}`);
+} else {
+  setAcademicYear(`${currentYear - 1}-${currentYear.toString().slice(-2)}`);
+}
 
 } else {
 
