@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
-import { Analytics } from "@vercel/analytics/next"; // 1. Imported here
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: 'Pioneer Academy Bikaner | Best IIT JEE, NEET & Foundation Coaching',
-  description: 'Bikaner\'s premier coaching institute for IIT JEE (Mains & Advanced), NEET-UG Medical preparation, and Class 9th-12th Foundation (CBSE/RBSE). Expert faculty, top AIR results, and small batches near Nathusar Gate.',
+  description: 'Bikaner\'s premier coaching institute for IIT JEE (Mains & Advanced), NEET-UG Medical preparation, and Class 9th-12th Foundation (CBSE/RBSE). Rated 4.8★ by 350+ students & parents near Nathusar Gate.',
   keywords: [
     // Brand
     'Pioneer Academy Bikaner', 'Pioneer Coaching Bikaner', 'Pioneer Institute Bikaner', 'Pioneer Academy Nathusar Gate',
@@ -36,30 +36,20 @@ export const metadata: Metadata = {
     'Bikaner me sabse achi coaching', 'NEET ki taiyari Bikaner', 'IIT JEE ki taiyari Bikaner',
     'Bikaner best teachers NEET', 'medical coaching hindi medium Bikaner', 'coaching institute Bikaner fees details',
     'Bikaner ka best coaching center',
-    // Core Institutional Keywords
-    'Pioneer Academy Bikaner', 'Pioneer Coaching Bikaner', 'Pioneer Institute',
-    // Medical / NEET Cluster
-    'NEET coaching Bikaner', 'Best institute for NEET in Bikaner', 'NEET UG preparation', 'Medical entrance exam coaching', 'Top medical coaching in Rajasthan', 'NEET dropper batch Bikaner', 'Biology coaching Bikaner', 'AIIMS preparation Bikaner', 'NEET target batch',
-    // Engineering / JEE Cluster
-    'IIT JEE coaching in Bikaner', 'JEE Mains and Advanced coaching', 'Best engineering coaching in Bikaner', 'JEE dropper batch', 'Physics chemistry math coaching', 'Top IIT coaching Rajasthan', 'JEE test series Bikaner',
-    // Foundation / School / Board Cluster
-    'Foundation classes 9th 10th Bikaner', 'Class 11 12 coaching Bikaner', 'CBSE board exam preparation', 'RBSE board coaching', 'NTSE preparation Bikaner', 'Olympiad coaching', 'Best science tuition Bikaner',
-    // Location & Intent Variations
-    'Coaching near Nathusar Gate Bikaner', 'Best coaching classes in Bikaner', 'Top 10 coaching in Bikaner', 'Bikaner coaching center fee', 'Best results in Bikaner coaching',
-    // Hindi / Hinglish Search Intent
-    'Bikaner me sabse achi coaching', 'NEET ki taiyari Bikaner', 'IIT JEE preparation Bikaner', 'Bikaner best teachers for NEET', 'Medical coaching hindi medium Bikaner',
-    // Founder / faculty recognition cluster
-    'Girish Sharma Coaching', 'Narendra Shekhawat Coaching', 'Girish Sharma Sir', 'Ashish Bissa Sir', 'Jai Dhaiya Sir',
-    'Best Physics Teacher in Bikaner', 'Best Chemistry Teacher in Bikaner', 'Best Biology Teacher in Bikaner', 'Best Maths Teacher in Bikaner', 'Best NEET Teacher Bikaner', 'Best JEE Teacher Bikaner',
+    // Founder & Full-Time Faculty Recognition Cluster
     'Dr. Narendra Shekhawat Bikaner', 'Dr. Narendra Shekhawat Pioneer Academy',
-    'Dr. Narendra Shekhawat coaching Bikaner', 'Narendra Shekhawat NEET faculty Bikaner',
+    'Girish Sharma Physics Bikaner', 'Girish Sir Physics Bikaner', 'Rudra Sir Physics Bikaner',
+    'Sumit Yogi Biology Bikaner', 'Sumit Sir Zoology Bikaner', 'Vikram Sir Botany Bikaner',
+    'Ashish Bissa Maths Bikaner', 'Naveen Sharma Maths Bikaner', 'Rohit Paliwal Maths Bikaner',
+    'Jai Dhaiya Chemistry Bikaner', 'Jay Dahiya Organic Chemistry Bikaner', 'Abhishek Sir Inorganic Chemistry Bikaner',
+    'Best Physics Teacher in Bikaner', 'Best Chemistry Teacher in Bikaner', 'Best Biology Teacher in Bikaner', 'Best Maths Teacher in Bikaner',
     // Topper / results intent
     'Bikaner JEE topper', 'Bikaner NEET topper', 'Bikaner top coaching institute',
     'Bikaner top rankers coaching', 'best results coaching Bikaner', 'JEE topper Bikaner Rajasthan',
     'NEET topper Bikaner Rajasthan', 'coaching with best toppers Bikaner'
   ].join(', '),
   openGraph: {
-    title: 'Pioneer Academy Bikaner | Top JEE & NEET Coaching',
+    title: 'Pioneer Academy Bikaner | Top JEE & NEET Coaching (4.8★ Rated)',
     description: 'Engineer your future or path to top Medical colleges with Bikaner’s premier coaching institute. Comprehensive pedagogy and proven AIR results.',
     url: 'https://pioneeracademybikaner.com',
     siteName: 'Pioneer Academy Bikaner',
@@ -107,10 +97,10 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body>
+      <body className={inter.className}>
         {children}
-        <Analytics /> {/* 2. Added here inside body */}
-        
+        <Analytics />
+
         {/* FLOATING WHATSAPP BUTTON */}
         <a
           href="https://wa.me/918302224782?text=Hi,%20I%20would%20like%20to%20know%20more%20about%20admissions%20at%20Pioneer%20Academy%20Bikaner."
@@ -131,6 +121,7 @@ export default function RootLayout({
             Chat with Us
           </span>
         </a>
+
         {/* SCHEMA MARKUP */}
         <script
           type="application/ld+json"
@@ -180,9 +171,24 @@ export default function RootLayout({
                 ],
                 "aggregateRating": {
                   "@type": "AggregateRating",
-                  "ratingValue": "4.9",
-                  "reviewCount": "125"
-                }
+                  "ratingValue": "4.8",
+                  "bestRating": "5",
+                  "reviewCount": "350"
+                },
+                "review": [
+                  {
+                    "@type": "Review",
+                    "author": { "@type": "Person", "name": "Sunil Goyal" },
+                    "reviewRating": { "@type": "Rating", "ratingValue": "5" },
+                    "reviewBody": "My son studied at Pioneer Academy and became a doctor. Today, he is pursuing MBBS from SPMC Bikaner. The teachers here teach very well."
+                  },
+                  {
+                    "@type": "Review",
+                    "author": { "@type": "Person", "name": "Dolly Purohit" },
+                    "reviewRating": { "@type": "Rating", "ratingValue": "5" },
+                    "reviewBody": "Regular NEET mock tests with detailed analysis helped me identify my weak areas. My score improved by 120 marks in just 4 months."
+                  }
+                ]
               },
               {
                 "@context": "https://schema.org",
@@ -193,7 +199,7 @@ export default function RootLayout({
                     "name": "Which is the best coaching for NEET and IIT JEE in Bikaner?",
                     "acceptedAnswer": {
                       "@type": "Answer",
-                      "text": "Pioneer Academy Bikaner is the premier institute for NEET and IIT JEE preparation, offering highly experienced faculty, small batch sizes, and exceptional results like AIR 4771 and AIR 7231 in NEET."
+                      "text": "Pioneer Academy Bikaner is the premier institute for NEET and IIT JEE preparation, offering highly experienced full-time faculty, small batch sizes, and exceptional results like AIR 4771 and AIR 7231 in NEET."
                     }
                   },
                   {
