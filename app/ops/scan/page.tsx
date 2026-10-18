@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useState, Suspense } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-const OPS_API_URL = "/api/ops";
-
+// Your verified Google Script Web App URL
+const OPS_API_URL = "https://script.google.com/macros/s/AKfycbx5MLk-jtWybtuGfKqQv2DYZzfOe_HeFb3yhWlqkAlnGCVrrqS1-1In0bN1ycaZmTbJ/exec";
 
 // Exact Pioneer Academy Bikaner Coordinates
 const ACADEMY_LAT = 28.011928;
@@ -111,7 +111,10 @@ function ScannerContent() {
   useEffect(() => {
     async function loadRoomData() {
       try {
-        const res = await fetch(`${OPS_API_URL}?action=room_info&room=${roomParam}`);
+        const res = await fetch(`${OPS_API_URL}?action=room_info&room=${roomParam}`, {
+          redirect: "follow",
+          cache: "no-store",
+        });
         const data = await res.json();
         if (data.ok) {
           setSlots(data.slots);
@@ -138,14 +141,13 @@ function ScannerContent() {
           });
           setSelectedSlotId(bestSlot);
 
-          // If no saved teacher, auto-fill scheduled teacher
           const matchedSlot = data.slots.find((s: SlotItem) => s.Slot_ID === bestSlot);
           if (matchedSlot && !localStorage.getItem("pioneer_teacher_id")) {
             setSelectedTeacherId(matchedSlot.Teacher_ID);
           }
         }
       } catch {
-        // Fallback if API URL not yet configured
+        // Fallback error handling
       }
     }
     loadRoomData();
@@ -167,13 +169,13 @@ function ScannerContent() {
     setSubmitting(true);
     setResultBanner(null);
 
-    // Save teacher credentials on their phone for 1-tap future check-ins
     localStorage.setItem("pioneer_teacher_id", selectedTeacherId);
     localStorage.setItem("pioneer_teacher_pin", pin);
 
     try {
       const res = await fetch(OPS_API_URL, {
         method: "POST",
+        redirect: "follow",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
           room: roomParam,
@@ -205,7 +207,6 @@ function ScannerContent() {
 
   return (
     <div className="min-h-screen bg-[#0d1a40] text-white flex flex-col justify-between p-4 max-w-md mx-auto">
-      {/* Header */}
       <div>
         <div className="bg-[#162b66] border-b-4 border-[#f9d200] rounded-2xl p-4 shadow-lg flex items-center justify-between mb-4">
           <div>
@@ -219,7 +220,6 @@ function ScannerContent() {
           </div>
         </div>
 
-        {/* GPS Geofence Verification Pill */}
         <div
           className={`rounded-xl p-3 mb-5 border flex items-center justify-between text-xs font-bold ${
             checkingGps
@@ -250,9 +250,7 @@ function ScannerContent() {
           </button>
         </div>
 
-        {/* Main Scanner Form Card */}
         <div className="bg-white text-gray-900 rounded-2xl p-5 shadow-2xl space-y-4">
-          {/* 1. Scheduled Lecture Slot */}
           <div>
             <label className="block text-xs font-black uppercase text-gray-500 mb-1">
               1. Active Class Slot ({roomParam})
@@ -270,7 +268,6 @@ function ScannerContent() {
             </select>
           </div>
 
-          {/* 2. Teacher Selection */}
           <div>
             <label className="block text-xs font-black uppercase text-gray-500 mb-1">
               2. Faculty Name
@@ -289,7 +286,6 @@ function ScannerContent() {
             </select>
           </div>
 
-          {/* 3. Secret 4-Digit PIN */}
           <div>
             <label className="block text-xs font-black uppercase text-gray-500 mb-1">
               3. Faculty 4-Digit PIN (Auto-Saved on Phone)
@@ -305,7 +301,6 @@ function ScannerContent() {
             />
           </div>
 
-          {/* 4. Topic / DPP Covered */}
           <div>
             <label className="block text-xs font-black uppercase text-gray-500 mb-1">
               4. Sub-Topic Taught / DPP Assigned (Optional)
@@ -319,7 +314,6 @@ function ScannerContent() {
             />
           </div>
 
-          {/* Action Buttons */}
           <div className="grid grid-cols-2 gap-3 pt-2">
             <button
               type="button"
@@ -339,7 +333,6 @@ function ScannerContent() {
             </button>
           </div>
 
-          {/* Result Status Banner */}
           {resultBanner && (
             <div
               className={`p-3 rounded-xl text-center font-bold text-sm ${

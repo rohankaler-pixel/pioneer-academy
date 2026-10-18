@@ -38,16 +38,10 @@ export default function ManagementDashboard() {
     setLoading(true);
     setError("");
     try {
-      let res = await fetch(`/api/ops?action=dashboard&key=${encodeURIComponent(keyToUse)}`, {
-        cache: "no-store",
-      });
-
-      if (!res.ok) {
-        res = await fetch(
-          `${DIRECT_SCRIPT_URL}?action=dashboard&key=${encodeURIComponent(keyToUse)}`,
-          { redirect: "follow", cache: "no-store" }
-        );
-      }
+      const res = await fetch(
+        `${DIRECT_SCRIPT_URL}?action=dashboard&key=${encodeURIComponent(keyToUse)}`,
+        { redirect: "follow", cache: "no-store" }
+      );
 
       const rawText = await res.text();
       let data;
