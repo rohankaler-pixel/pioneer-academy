@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 
-const OPS_API_URL = "/api/ops";
+const DIRECT_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbzLAhd4FjQV7d-9o39bNi-AiR5TOgc_o0KLVqRFRtFdIKHk1rpC4hvA556f982iP0x7/exec";
 
 interface ScanLog {
   Timestamp: string;
@@ -31,14 +32,33 @@ export default function ManagementDashboard() {
 
   const [teachers, setTeachers] = useState<{ id: string; name: string; subject: string }[]>([]);
   const [logs, setLogs] = useState<ScanLog[]>([]);
-  const [rangeDays, setRangeDays] = useState<number>(7); // 1 = Today, 7 = Week, 30 = Month
+  const [rangeDays, setRangeDays] = useState<number>(7);
 
   const fetchDashboard = async (keyToUse: string) => {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`${OPS_API_URL}?action=dashboard&key=${encodeURIComponent(keyToUse)}`);
-      const data = await res.json();
+      let res = await fetch(`/api/ops?action=dashboard&key=${encodeURIComponent(keyToUse)}`, {
+        cache: "no-store",
+      });
+
+      if (!res.ok) {
+        res = await fetch(
+          `${DIRECT_SCRIPT_URL}?action=dashboard&key=${encodeURIComponent(keyToUse)}`,
+          { redirect: "follow", cache: "no-store" }
+        );
+      }
+
+      const rawText = await res.text();
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        setError(`Script returned non-JSON (${res.status}): ${rawText.slice(0, 100)}...`);
+        setLoading(false);
+        return;
+      }
+
       if (data.ok) {
         setTeachers(data.teachers);
         setLogs(data.logs);
@@ -46,8 +66,8 @@ export default function ManagementDashboard() {
       } else {
         setError(data.error || "Invalid Passcode");
       }
-    } catch {
-      setError("Unable to connect to Ops Google Sheet.");
+    } catch (err: any) {
+      setError(`Connection Error: ${err?.message || "Failed to reach server"}`);
     } finally {
       setLoading(false);
     }
@@ -58,9 +78,7 @@ export default function ManagementDashboard() {
       <div className="min-h-screen bg-[#0d1a40] flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl border-t-4 border-[#f9d200]">
           <h1 className="text-2xl font-black text-[#162b66] mb-1">Pioneer Ops Command</h1>
-          <p className="text-xs text-gray-500 font-bold mb-6">
-            Restricted Management View • Bikaner
-          </p>
+          <p className="text-xs text-gray-500 font-bold mb-6">Restricted Management View • Bikaner</p>
           <input
             type="password"
             placeholder="Enter Admin Passcode"
@@ -81,19 +99,13 @@ export default function ManagementDashboard() {
     );
   }
 
-  // Filter Logs by Date Range
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - rangeDays);
   const filteredLogs = logs.filter((l) => new Date(l.Timestamp) >= cutoff);
 
-  // Compute Teacher Leaderboard Metrics
   const leaderboard = teachers.map((t) => {
-    const startScans = filteredLogs.filter(
-      (l) => l.Teacher_ID === t.id && l.Action_Type === "START"
-    );
-    const endScans = filteredLogs.filter(
-      (l) => l.Teacher_ID === t.id && l.Action_Type === "END"
-    );
+    const startScans = filteredLogs.filter((l) => l.Teacher_ID === t.id && l.Action_Type === "START");
+    const endScans = filteredLogs.filter((l) => l.Teacher_ID === t.id && l.Action_Type === "END");
     const onTimeCount = startScans.filter((l) => l.Status.startsWith("ON_TIME")).length;
     const earlyExits = endScans.filter((l) => l.Status.startsWith("EARLY_EXIT")).length;
 
@@ -108,22 +120,13 @@ export default function ManagementDashboard() {
     const onTimePct =
       startScans.length > 0 ? Math.round((onTimeCount / startScans.length) * 100) : 100;
 
-    return {
-      ...t,
-      totalStarts: startScans.length,
-      onTimeCount,
-      earlyExits,
-      avgDelay,
-      onTimePct
-    };
+    return { ...t, totalStarts: startScans.length, onTimeCount, earlyExits, avgDelay, onTimePct };
   });
 
-  // Live Status per Room (LT-1 to LT-5)
   const rooms = ["LT-1", "LT-2", "LT-3", "LT-4", "LT-5"];
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 pb-16">
-      {/* Top Bar */}
       <div className="bg-[#162b66] text-white py-5 px-6 border-b-4 border-[#f9d200]">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div>
@@ -163,7 +166,6 @@ export default function ManagementDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 mt-8 space-y-8">
-        {/* 1. Live Lecture Theater Status (LT-1 to LT-5) */}
         <div>
           <h2 className="text-lg font-black text-[#162b66] mb-3 uppercase">
             Live Classroom Feed (LT-1 to LT-5)
@@ -172,10 +174,7 @@ export default function ManagementDashboard() {
             {rooms.map((room) => {
               const latestRoomScan = logs.find((l) => l.Room === room);
               return (
-                <div
-                  key={room}
-                  className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm"
-                >
+                <div key={room} className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm">
                   <div className="flex justify-between items-center mb-2">
                     <span className="font-black text-lg text-[#162b66]">{room}</span>
                     <span
@@ -191,13 +190,8 @@ export default function ManagementDashboard() {
                   {latestRoomScan ? (
                     <div className="text-xs space-y-1 text-gray-600">
                       <p className="font-bold text-gray-900">{latestRoomScan.Teacher_Name}</p>
-                      <p>
-                        Batch: <strong>{latestRoomScan.Batch}</strong>
-                      </p>
-                      <p>
-                        Logged: <strong>{latestRoomScan.Actual_Time}</strong> (
-                        {latestRoomScan.Status})
-                      </p>
+                      <p>Batch: <strong>{latestRoomScan.Batch}</strong></p>
+                      <p>Logged: <strong>{latestRoomScan.Actual_Time}</strong> ({latestRoomScan.Status})</p>
                       <p className="truncate text-[11px] text-[#00b4d8] font-semibold">
                         Topic: {latestRoomScan.Topic_DPP}
                       </p>
@@ -211,15 +205,12 @@ export default function ManagementDashboard() {
           </div>
         </div>
 
-        {/* 2. Teacher Punctuality Leaderboard */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="p-5 border-b border-gray-100 flex justify-between items-center">
             <h2 className="text-lg font-black text-[#162b66] uppercase">
               Teacher On-Time % Leaderboard (Last {rangeDays} Days)
             </h2>
-            <span className="text-xs font-bold text-gray-500">
-              Grace Window: &le; 4 mins from bell
-            </span>
+            <span className="text-xs font-bold text-gray-500">Grace Window: &le; 4 mins</span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-sm">
@@ -256,53 +247,6 @@ export default function ManagementDashboard() {
                         {t.onTimePct}%
                       </span>
                     </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* 3. Raw Scan Audit Log */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="p-5 border-b border-gray-100">
-            <h2 className="text-lg font-black text-[#162b66] uppercase">
-              Recent Classroom Scan Logs (GPS & Timestamp Verified)
-            </h2>
-          </div>
-          <div className="overflow-x-auto max-h-96">
-            <table className="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr className="bg-gray-50 text-gray-500 uppercase font-black border-b">
-                  <th className="p-3">Date & Time</th>
-                  <th className="p-3">Room / Batch</th>
-                  <th className="p-3">Faculty</th>
-                  <th className="p-3">Action</th>
-                  <th className="p-3">Scheduled</th>
-                  <th className="p-3">Status / Delay</th>
-                  <th className="p-3">GPS Dist</th>
-                  <th className="p-3">Topic / DPP</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filteredLogs.map((log, i) => (
-                  <tr key={i} className="hover:bg-gray-50">
-                    <td className="p-3 font-bold">
-                      {log.Date_Str} • {log.Actual_Time}
-                    </td>
-                    <td className="p-3 font-black text-[#162b66]">
-                      {log.Room} ({log.Batch})
-                    </td>
-                    <td className="p-3 font-bold">{log.Teacher_Name}</td>
-                    <td className="p-3 font-black">{log.Action_Type}</td>
-                    <td className="p-3 text-gray-500">
-                      {log.Scheduled_Start} - {log.Scheduled_End}
-                    </td>
-                    <td className="p-3 font-bold">
-                      {log.Status} ({Number(log.Delay_Mins) > 0 ? `+${log.Delay_Mins}m` : "0m"})
-                    </td>
-                    <td className="p-3 text-gray-500">{log.Distance_Meters}m</td>
-                    <td className="p-3 text-gray-700">{log.Topic_DPP}</td>
                   </tr>
                 ))}
               </tbody>
