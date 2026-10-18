@@ -1,24 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const GOOGLE_SCRIPT_URL =
-  process.env.NEXT_PUBLIC_PIONEER_OPS_API ||
   "https://script.google.com/macros/s/AKfycbzLAhd4FjQV7d-9o39bNi-AiR5TOgc_o0KLVqRFRtFdIKHk1rpC4hvA556f982iP0x7/exec";
 
 export async function GET(req: NextRequest) {
   try {
     const search = req.nextUrl.searchParams.toString();
-    const res = await fetch(`${GOOGLE_SCRIPT_URL}?${search}`, {
+    const targetUrl = `${GOOGLE_SCRIPT_URL}?${search}`;
+    
+    const res = await fetch(targetUrl, {
       method: "GET",
       redirect: "follow",
       cache: "no-store",
     });
+
     const text = await res.text();
+    
     try {
-      return NextResponse.json(JSON.parse(text));
+      const json = JSON.parse(text);
+      return NextResponse.json(json);
     } catch {
+      // If Google returned HTML/text instead of JSON, return it cleanly for debugging
       return NextResponse.json({
         ok: false,
-        error: "Google Script returned HTML instead of JSON. Please run setupDatabase() in Apps Script to authorize permissions and deploy a New Version.",
+        error: `Google Script returned non-JSON response. Check Apps Script deployment permissions. Raw: ${text.slice(0, 150)}`,
       });
     }
   } catch (err: any) {
@@ -35,13 +40,15 @@ export async function POST(req: NextRequest) {
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body,
     });
+
     const text = await res.text();
     try {
-      return NextResponse.json(JSON.parse(text));
+      const json = JSON.parse(text);
+      return NextResponse.json(json);
     } catch {
       return NextResponse.json({
         ok: false,
-        error: "Google Script returned HTML instead of JSON. Check Apps Script permissions.",
+        error: `Google Script POST returned non-JSON. Raw: ${text.slice(0, 150)}`,
       });
     }
   } catch (err: any) {
