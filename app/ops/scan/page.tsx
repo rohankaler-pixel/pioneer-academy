@@ -3,9 +3,7 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-const OPS_API_URL =
-  process.env.NEXT_PUBLIC_PIONEER_OPS_API ||
-  "https://script.google.com/macros/s/AKfycbzLAhd4FjQV7d-9o39bNi-AiR5TOgc_o0KLVqRFRtFdIKHk1rpC4hvA556f982iP0x7/exec";
+const OPS_API_URL = "/api/ops";
 
 
 // Exact Pioneer Academy Bikaner Coordinates
