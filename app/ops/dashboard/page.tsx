@@ -3,8 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 
-const DIRECT_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbzLAhd4FjQV7d-9o39bNi-AiR5TOgc_o0KLVqRFRtFdIKHk1rpC4hvA556f982iP0x7/exec";
+const OPS_API_URL = "/api/ops";
 
 interface ScanLog {
   Timestamp: string;
@@ -38,10 +37,9 @@ export default function ManagementDashboard() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(
-        `${DIRECT_SCRIPT_URL}?action=dashboard&key=${encodeURIComponent(keyToUse)}`,
-        { redirect: "follow", cache: "no-store" }
-      );
+      const res = await fetch(`${OPS_API_URL}?action=dashboard&key=${encodeURIComponent(keyToUse)}`, {
+  cache: "no-store",
+});
 
       const rawText = await res.text();
       let data;

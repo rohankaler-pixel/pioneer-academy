@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const GOOGLE_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbzLAhd4FjQV7d-9o39bNi-AiR5TOgc_o0KLVqRFRtFdIKHk1rpC4hvA556f982iP0x7/exec";
+  "https://script.google.com/macros/s/AKfycbx5MLk-jtWybtuGfKqQv2DYZzfOe_HeFb3yhWlqkAlnGCVrrqS1-1In0bN1ycaZmTbJ/exec";
 
 export async function GET(req: NextRequest) {
   try {
     const search = req.nextUrl.searchParams.toString();
     const targetUrl = `${GOOGLE_SCRIPT_URL}?${search}`;
-    
+
     const res = await fetch(targetUrl, {
       method: "GET",
       redirect: "follow",
@@ -15,15 +15,13 @@ export async function GET(req: NextRequest) {
     });
 
     const text = await res.text();
-    
     try {
       const json = JSON.parse(text);
       return NextResponse.json(json);
     } catch {
-      // If Google returned HTML/text instead of JSON, return it cleanly for debugging
       return NextResponse.json({
         ok: false,
-        error: `Google Script returned non-JSON response. Check Apps Script deployment permissions. Raw: ${text.slice(0, 150)}`,
+        error: `Google Script returned non-JSON. Raw: ${text.slice(0, 150)}`,
       });
     }
   } catch (err: any) {

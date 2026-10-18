@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
 // Your verified Google Script Web App URL
-const OPS_API_URL = "https://script.google.com/macros/s/AKfycbx5MLk-jtWybtuGfKqQv2DYZzfOe_HeFb3yhWlqkAlnGCVrrqS1-1In0bN1ycaZmTbJ/exec";
+const OPS_API_URL = "/api/ops";
 
 // Exact Pioneer Academy Bikaner Coordinates
 const ACADEMY_LAT = 28.011928;
