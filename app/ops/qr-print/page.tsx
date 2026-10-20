@@ -3,6 +3,7 @@
 import React from "react";
 
 const ROOMS = [
+  { room: "STAFF", subtitle: "Non-Academic Staff Shift Check-In & Check-Out (Reception)" },
   { room: "LT-1", subtitle: "Target (Repeater) Batch" },
   { room: "LT-2", subtitle: "Class 11th (English & Hindi Medium)" },
   { room: "LT-3", subtitle: "Class 12th (Hindi Medium)" },
@@ -15,21 +16,24 @@ export default function PrintableQRPosters() {
     <div className="min-h-screen bg-gray-100 p-6 print:p-0 print:bg-white">
       <div className="max-w-4xl mx-auto mb-6 flex justify-between items-center print:hidden bg-[#162b66] text-white p-4 rounded-xl">
         <div>
-          <h1 className="text-xl font-black">Classroom QR Code Generator (LT-1 to LT-5)</h1>
+          <h1 className="text-xl font-black">
+            Pioneer Academy QR Generator (LT-1 to LT-5 + Non-Academic STAFF)
+          </h1>
           <p className="text-xs text-gray-300">
-            Print and laminate these 5 sheets. Paste next to the whiteboard in each Lecture Theater.
+            Print and laminate these 6 sheets. Paste the STAFF poster at Reception and LT-1..LT-5 in classrooms.
           </p>
         </div>
         <button
           onClick={() => window.print()}
           className="bg-[#f9d200] text-[#162b66] px-5 py-2.5 rounded-lg font-black text-sm shadow-md"
         >
-          🖨️ Print All Posters
+          🖨️ Print All 6 Posters
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto print:grid-cols-2">
         {ROOMS.map((item) => {
+          const isStaff = item.room === "STAFF";
           const scanUrl = `https://pioneeracademybikaner.com/ops/scan?room=${item.room}`;
           const qrImgSrc = `https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=10&data=${encodeURIComponent(
             scanUrl
@@ -44,11 +48,12 @@ export default function PrintableQRPosters() {
                 <p className="text-xs font-bold text-[#f9d200] uppercase tracking-widest">
                   Pioneer Academy Bikaner
                 </p>
-                <h2 className="text-4xl font-black mt-1">{item.room}</h2>
+                <h2 className="text-3xl font-black mt-1">
+                  {isStaff ? "OFFICE STAFF QR" : item.room}
+                </h2>
                 <p className="text-xs text-gray-200 font-semibold mt-0.5">{item.subtitle}</p>
               </div>
 
-              {/* QR Image */}
               <div className="p-3 border-2 border-dashed border-gray-300 rounded-2xl my-2">
                 <img
                   src={qrImgSrc}
@@ -59,10 +64,21 @@ export default function PrintableQRPosters() {
 
               <div className="mt-4 space-y-1 text-xs text-gray-700 font-bold bg-gray-50 p-3 rounded-xl w-full border border-gray-200">
                 <p className="text-[#162b66] font-black text-sm">
-                  FACULTY ATTENDANCE & SYLLABUS LOG
+                  {isStaff
+                    ? "NON-ACADEMIC STAFF CHECK-IN / CHECK-OUT"
+                    : "FACULTY ATTENDANCE & SYLLABUS LOG"}
                 </p>
-                <p>1. कक्षा शुरू करते समय स्कैन करें और 🟢 START दबाएं।</p>
-                <p>2. कक्षा समाप्त होने पर पुनः स्कैन करें और 🔴 END दबाएं।</p>
+                {isStaff ? (
+                  <>
+                    <p>1. ऑफिस आने पर स्कैन करें और 🟢 CHECK IN दबाएं।</p>
+                    <p>2. ऑफिस से जाते समय स्कैन करें और 🔴 CHECK OUT दबाएं।</p>
+                  </>
+                ) : (
+                  <>
+                    <p>1. कक्षा शुरू करते समय स्कैन करें और 🟢 START दबाएं।</p>
+                    <p>2. कक्षा समाप्त होने पर पुनः स्कैन करें और 🔴 END दबाएं।</p>
+                  </>
+                )}
                 <p className="text-[10px] text-gray-400 pt-1">{scanUrl}</p>
               </div>
             </div>

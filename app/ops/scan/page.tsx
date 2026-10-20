@@ -3,13 +3,12 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-// Your verified Google Script Web App URL
 const OPS_API_URL = "/api/ops";
 
 // Exact Pioneer Academy Bikaner Coordinates
 const ACADEMY_LAT = 28.011928;
 const ACADEMY_LNG = 73.292024;
-const MAX_ALLOWED_METERS = 65; // 65m radius buffer for indoor mobile GPS drift
+const MAX_ALLOWED_METERS = 65;
 
 interface SlotItem {
   Slot_ID: string;
@@ -28,6 +27,14 @@ interface TeacherItem {
   subject: string;
 }
 
+interface StaffItem {
+  id: string;
+  name: string;
+  role: string;
+  shiftStart: string;
+  shiftEnd: string;
+}
+
 function calculateMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371e3;
   const toRad = (deg: number) => (deg * Math.PI) / 180;
@@ -42,13 +49,21 @@ function calculateMeters(lat1: number, lon1: number, lat2: number, lon2: number)
 function ScannerContent() {
   const searchParams = useSearchParams();
   const roomParam = (searchParams.get("room") || "LT-1").toUpperCase();
+  const isStaffMode = roomParam === "STAFF";
 
+  // Academic State
   const [slots, setSlots] = useState<SlotItem[]>([]);
   const [teachers, setTeachers] = useState<TeacherItem[]>([]);
   const [selectedSlotId, setSelectedSlotId] = useState<string>("");
   const [selectedTeacherId, setSelectedTeacherId] = useState<string>("");
+
+  // Non-Academic Staff State
+  const [staffList, setStaffList] = useState<StaffItem[]>([]);
+  const [selectedStaffId, setSelectedStaffId] = useState<string>("");
+
+  // Shared State
   const [pin, setPin] = useState<string>("");
-  const [topic, setTopic] = useState<string>("");
+  const [topicOrNotes, setTopicOrNotes] = useState<string>("");
   const [deviceId, setDeviceId] = useState<string>("");
 
   // GPS State
@@ -60,7 +75,6 @@ function ScannerContent() {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [resultBanner, setResultBanner] = useState<{ ok: boolean; text: string } | null>(null);
 
-  // 1. Initialize Device Fingerprint & Saved Teacher Credentials
   useEffect(() => {
     let devId = localStorage.getItem("pioneer_device_id");
     if (!devId) {
@@ -69,13 +83,19 @@ function ScannerContent() {
     }
     setDeviceId(devId);
 
-    const savedTeacher = localStorage.getItem("pioneer_teacher_id");
-    const savedPin = localStorage.getItem("pioneer_teacher_pin");
-    if (savedTeacher) setSelectedTeacherId(savedTeacher);
-    if (savedPin) setPin(savedPin);
-  }, []);
+    if (isStaffMode) {
+      const savedStaff = localStorage.getItem("pioneer_staff_id");
+      const savedStaffPin = localStorage.getItem("pioneer_staff_pin");
+      if (savedStaff) setSelectedStaffId(savedStaff);
+      if (savedStaffPin) setPin(savedStaffPin);
+    } else {
+      const savedTeacher = localStorage.getItem("pioneer_teacher_id");
+      const savedPin = localStorage.getItem("pioneer_teacher_pin");
+      if (savedTeacher) setSelectedTeacherId(savedTeacher);
+      if (savedPin) setPin(savedPin);
+    }
+  }, [isStaffMode]);
 
-  // 2. Verify GPS Location on Mobile Data
   const verifyGpsLocation = () => {
     setCheckingGps(true);
     setGpsError("");
@@ -96,7 +116,7 @@ function ScannerContent() {
         setCheckingGps(false);
       },
       () => {
-        setGpsError("Please allow Location Access on your phone to log class attendance.");
+        setGpsError("Please allow Location Access on your phone to log attendance.");
         setCheckingGps(false);
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
@@ -107,20 +127,24 @@ function ScannerContent() {
     verifyGpsLocation();
   }, []);
 
-  // 3. Fetch Room Schedule from Master Google Sheet
   useEffect(() => {
     async function loadRoomData() {
       try {
         const res = await fetch(`${OPS_API_URL}?action=room_info&room=${roomParam}`, {
-          redirect: "follow",
           cache: "no-store",
         });
         const data = await res.json();
-        if (data.ok) {
+        if (!data.ok) return;
+
+        if (isStaffMode && data.staff) {
+          setStaffList(data.staff);
+          if (!localStorage.getItem("pioneer_staff_id") && data.staff[0]) {
+            setSelectedStaffId(data.staff[0].id);
+          }
+        } else if (data.slots) {
           setSlots(data.slots);
           setTeachers(data.teachers);
 
-          // Auto-select the slot closest to current time
           const now = new Date();
           const nowMins = now.getHours() * 60 + now.getMinutes();
           let bestSlot = data.slots[0]?.Slot_ID || "";
@@ -151,50 +175,72 @@ function ScannerContent() {
       }
     }
     loadRoomData();
-  }, [roomParam]);
+  }, [roomParam, isStaffMode]);
 
   const activeSlot = slots.find((s) => s.Slot_ID === selectedSlotId);
   const insideGeofence = distanceMeters !== null && distanceMeters <= MAX_ALLOWED_METERS;
 
-  const handleScanSubmit = async (actionType: "START" | "END") => {
-    if (!activeSlot || !selectedTeacherId || !pin) {
-      setResultBanner({ ok: false, text: "Please select your name and enter your 4-digit PIN." });
-      return;
-    }
+  const handleScanSubmit = async (actionType: "START" | "END" | "CHECK_IN" | "CHECK_OUT") => {
     if (!insideGeofence) {
       setResultBanner({ ok: false, text: "You are outside Pioneer Academy campus radius." });
       return;
     }
 
+    if (isStaffMode) {
+      if (!selectedStaffId || !pin) {
+        setResultBanner({ ok: false, text: "Please select your name and enter your 4-digit PIN." });
+        return;
+      }
+      localStorage.setItem("pioneer_staff_id", selectedStaffId);
+      localStorage.setItem("pioneer_staff_pin", pin);
+    } else {
+      if (!activeSlot || !selectedTeacherId || !pin) {
+        setResultBanner({ ok: false, text: "Please select your name and enter your 4-digit PIN." });
+        return;
+      }
+      localStorage.setItem("pioneer_teacher_id", selectedTeacherId);
+      localStorage.setItem("pioneer_teacher_pin", pin);
+    }
+
     setSubmitting(true);
     setResultBanner(null);
 
-    localStorage.setItem("pioneer_teacher_id", selectedTeacherId);
-    localStorage.setItem("pioneer_teacher_pin", pin);
-
     try {
+      const payload = isStaffMode
+        ? {
+            mode: "STAFF",
+            room: "STAFF",
+            staffId: selectedStaffId,
+            pin,
+            actionType,
+            notes: topicOrNotes,
+            distanceMeters,
+            deviceId
+          }
+        : {
+            mode: "ACADEMIC",
+            room: roomParam,
+            slotId: activeSlot?.Slot_ID,
+            batch: activeSlot?.Batch,
+            scheduledStart: activeSlot?.Start_Time,
+            scheduledEnd: activeSlot?.End_Time,
+            teacherId: selectedTeacherId,
+            pin,
+            actionType,
+            topic: topicOrNotes,
+            distanceMeters,
+            deviceId
+          };
+
       const res = await fetch(OPS_API_URL, {
         method: "POST",
-        redirect: "follow",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({
-          room: roomParam,
-          slotId: activeSlot.Slot_ID,
-          batch: activeSlot.Batch,
-          scheduledStart: activeSlot.Start_Time,
-          scheduledEnd: activeSlot.End_Time,
-          teacherId: selectedTeacherId,
-          pin,
-          actionType,
-          topic,
-          distanceMeters,
-          deviceId
-        })
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
       if (data.ok) {
         setResultBanner({ ok: true, text: `✓ ${data.message}` });
-        setTopic("");
+        setTopicOrNotes("");
       } else {
         setResultBanner({ ok: false, text: data.error || "Submission failed" });
       }
@@ -211,15 +257,18 @@ function ScannerContent() {
         <div className="bg-[#162b66] border-b-4 border-[#f9d200] rounded-2xl p-4 shadow-lg flex items-center justify-between mb-4">
           <div>
             <p className="text-xs font-bold text-[#f9d200] uppercase tracking-wider">
-              Pioneer Academy Classroom Ops
+              {isStaffMode ? "Non-Academic Shift Attendance" : "Pioneer Academy Classroom Ops"}
             </p>
-            <h1 className="text-2xl font-black">Room: {roomParam}</h1>
+            <h1 className="text-2xl font-black">
+              {isStaffMode ? "Office Check-In / Out" : `Room: ${roomParam}`}
+            </h1>
           </div>
-          <div className="bg-[#f9d200] text-[#162b66] font-black px-3 py-1.5 rounded-xl text-sm">
-            LIVE QR
+          <div className="bg-[#f9d200] text-[#162b66] font-black px-3 py-1.5 rounded-xl text-xs">
+            {isStaffMode ? "STAFF QR" : "CLASS QR"}
           </div>
         </div>
 
+        {/* GPS Pill */}
         <div
           className={`rounded-xl p-3 mb-5 border flex items-center justify-between text-xs font-bold ${
             checkingGps
@@ -250,88 +299,162 @@ function ScannerContent() {
           </button>
         </div>
 
+        {/* Main Card */}
         <div className="bg-white text-gray-900 rounded-2xl p-5 shadow-2xl space-y-4">
-          <div>
-            <label className="block text-xs font-black uppercase text-gray-500 mb-1">
-              1. Active Class Slot ({roomParam})
-            </label>
-            <select
-              value={selectedSlotId}
-              onChange={(e) => setSelectedSlotId(e.target.value)}
-              className="w-full border-2 border-gray-200 rounded-xl p-3 font-bold text-sm bg-gray-50 focus:border-[#162b66] outline-none"
-            >
-              {slots.map((s) => (
-                <option key={s.Slot_ID} value={s.Slot_ID}>
-                  {s.Start_Time} - {s.End_Time} | {s.Batch} ({s.Subject_Note})
-                </option>
-              ))}
-            </select>
-          </div>
+          {isStaffMode ? (
+            /* NON-ACADEMIC STAFF FORM */
+            <>
+              <div>
+                <label className="block text-xs font-black uppercase text-gray-500 mb-1">
+                  1. Select Employee Name
+                </label>
+                <select
+                  value={selectedStaffId}
+                  onChange={(e) => setSelectedStaffId(e.target.value)}
+                  className="w-full border-2 border-gray-200 rounded-xl p-3 font-bold text-sm bg-gray-50 focus:border-[#162b66] outline-none"
+                >
+                  <option value="">-- Select Staff Member --</option>
+                  {staffList.map((st) => (
+                    <option key={st.id} value={st.id}>
+                      {st.name} ({st.role} • {st.shiftStart}-{st.shiftEnd})
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          <div>
-            <label className="block text-xs font-black uppercase text-gray-500 mb-1">
-              2. Faculty Name
-            </label>
-            <select
-              value={selectedTeacherId}
-              onChange={(e) => setSelectedTeacherId(e.target.value)}
-              className="w-full border-2 border-gray-200 rounded-xl p-3 font-bold text-sm bg-gray-50 focus:border-[#162b66] outline-none"
-            >
-              <option value="">-- Select Teacher --</option>
-              {teachers.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name} ({t.subject})
-                </option>
-              ))}
-            </select>
-          </div>
+              <div>
+                <label className="block text-xs font-black uppercase text-gray-500 mb-1">
+                  2. Staff 4-Digit PIN (Auto-Saved on Phone)
+                </label>
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  maxLength={4}
+                  placeholder="••••"
+                  value={pin}
+                  onChange={(e) => setPin(e.target.value)}
+                  className="w-full border-2 border-gray-200 rounded-xl p-3 font-black text-center tracking-widest text-lg bg-gray-50 focus:border-[#162b66] outline-none"
+                />
+              </div>
 
-          <div>
-            <label className="block text-xs font-black uppercase text-gray-500 mb-1">
-              3. Faculty 4-Digit PIN (Auto-Saved on Phone)
-            </label>
-            <input
-              type="password"
-              inputMode="numeric"
-              maxLength={4}
-              placeholder="••••"
-              value={pin}
-              onChange={(e) => setPin(e.target.value)}
-              className="w-full border-2 border-gray-200 rounded-xl p-3 font-black text-center tracking-widest text-lg bg-gray-50 focus:border-[#162b66] outline-none"
-            />
-          </div>
+              <div>
+                <label className="block text-xs font-black uppercase text-gray-500 mb-1">
+                  3. Shift Note / Remark (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g., Morning Shift / OMR Scanning Done"
+                  value={topicOrNotes}
+                  onChange={(e) => setTopicOrNotes(e.target.value)}
+                  className="w-full border-2 border-gray-200 rounded-xl p-3 text-sm bg-gray-50 focus:border-[#162b66] outline-none"
+                />
+              </div>
 
-          <div>
-            <label className="block text-xs font-black uppercase text-gray-500 mb-1">
-              4. Sub-Topic Taught / DPP Assigned (Optional)
-            </label>
-            <input
-              type="text"
-              placeholder="e.g., Rotational Motion L-4 / DPP #12"
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-              className="w-full border-2 border-gray-200 rounded-xl p-3 text-sm bg-gray-50 focus:border-[#162b66] outline-none"
-            />
-          </div>
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <button
+                  type="button"
+                  disabled={submitting || !insideGeofence}
+                  onClick={() => handleScanSubmit("CHECK_IN")}
+                  className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white font-black py-4 rounded-xl shadow-lg text-base transition active:scale-95"
+                >
+                  🟢 CHECK IN
+                </button>
+                <button
+                  type="button"
+                  disabled={submitting || !insideGeofence}
+                  onClick={() => handleScanSubmit("CHECK_OUT")}
+                  className="bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white font-black py-4 rounded-xl shadow-lg text-base transition active:scale-95"
+                >
+                  🔴 CHECK OUT
+                </button>
+              </div>
+            </>
+          ) : (
+            /* ACADEMIC CLASSROOM FORM */
+            <>
+              <div>
+                <label className="block text-xs font-black uppercase text-gray-500 mb-1">
+                  1. Active Class Slot ({roomParam})
+                </label>
+                <select
+                  value={selectedSlotId}
+                  onChange={(e) => setSelectedSlotId(e.target.value)}
+                  className="w-full border-2 border-gray-200 rounded-xl p-3 font-bold text-sm bg-gray-50 focus:border-[#162b66] outline-none"
+                >
+                  {slots.map((s) => (
+                    <option key={s.Slot_ID} value={s.Slot_ID}>
+                      {s.Start_Time} - {s.End_Time} | {s.Batch} ({s.Subject_Note})
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          <div className="grid grid-cols-2 gap-3 pt-2">
-            <button
-              type="button"
-              disabled={submitting || !insideGeofence}
-              onClick={() => handleScanSubmit("START")}
-              className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white font-black py-4 rounded-xl shadow-lg text-base transition active:scale-95"
-            >
-              🟢 START CLASS
-            </button>
-            <button
-              type="button"
-              disabled={submitting || !insideGeofence}
-              onClick={() => handleScanSubmit("END")}
-              className="bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white font-black py-4 rounded-xl shadow-lg text-base transition active:scale-95"
-            >
-              🔴 END CLASS
-            </button>
-          </div>
+              <div>
+                <label className="block text-xs font-black uppercase text-gray-500 mb-1">
+                  2. Faculty Name
+                </label>
+                <select
+                  value={selectedTeacherId}
+                  onChange={(e) => setSelectedTeacherId(e.target.value)}
+                  className="w-full border-2 border-gray-200 rounded-xl p-3 font-bold text-sm bg-gray-50 focus:border-[#162b66] outline-none"
+                >
+                  <option value="">-- Select Teacher --</option>
+                  {teachers.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name} ({t.subject})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-black uppercase text-gray-500 mb-1">
+                  3. Faculty 4-Digit PIN (Auto-Saved on Phone)
+                </label>
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  maxLength={4}
+                  placeholder="••••"
+                  value={pin}
+                  onChange={(e) => setPin(e.target.value)}
+                  className="w-full border-2 border-gray-200 rounded-xl p-3 font-black text-center tracking-widest text-lg bg-gray-50 focus:border-[#162b66] outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-black uppercase text-gray-500 mb-1">
+                  4. Sub-Topic Taught / DPP Assigned (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g., Rotational Motion L-4 / DPP #12"
+                  value={topicOrNotes}
+                  onChange={(e) => setTopicOrNotes(e.target.value)}
+                  className="w-full border-2 border-gray-200 rounded-xl p-3 text-sm bg-gray-50 focus:border-[#162b66] outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <button
+                  type="button"
+                  disabled={submitting || !insideGeofence}
+                  onClick={() => handleScanSubmit("START")}
+                  className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white font-black py-4 rounded-xl shadow-lg text-base transition active:scale-95"
+                >
+                  🟢 START CLASS
+                </button>
+                <button
+                  type="button"
+                  disabled={submitting || !insideGeofence}
+                  onClick={() => handleScanSubmit("END")}
+                  className="bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white font-black py-4 rounded-xl shadow-lg text-base transition active:scale-95"
+                >
+                  🔴 END CLASS
+                </button>
+              </div>
+            </>
+          )}
 
           {resultBanner && (
             <div
