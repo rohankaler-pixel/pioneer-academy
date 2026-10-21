@@ -49,7 +49,8 @@ export default function OpsDashboardPage() {
 
   const [activeTab, setActiveTab] = useState<"ACADEMIC" | "STAFF">("ACADEMIC");
 
-  // Filters
+  // Filters & Presets
+  const [datePreset, setDatePreset] = useState<"TODAY" | "7DAYS" | "MONTH" | "ALL">("ALL");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedRoom, setSelectedRoom] = useState("ALL");
@@ -99,6 +100,30 @@ export default function OpsDashboardPage() {
     }
   };
 
+  // Handle Date Preset Selection
+  const applyDatePreset = (preset: "TODAY" | "7DAYS" | "MONTH" | "ALL") => {
+    setDatePreset(preset);
+    const todayStr = new Date().toISOString().split("T")[0];
+
+    if (preset === "TODAY") {
+      setStartDate(todayStr);
+      setEndDate(todayStr);
+    } else if (preset === "7DAYS") {
+      const d = new Date();
+      d.setDate(d.getDate() - 7);
+      setStartDate(d.toISOString().split("T")[0]);
+      setEndDate(todayStr);
+    } else if (preset === "MONTH") {
+      const d = new Date();
+      const firstDay = new Date(d.getFullYear(), d.getMonth(), 1).toISOString().split("T")[0];
+      setStartDate(firstDay);
+      setEndDate(todayStr);
+    } else {
+      setStartDate("");
+      setEndDate("");
+    }
+  };
+
   if (!isAuthed) {
     return (
       <div className="min-h-screen bg-[#0d1a40] flex items-center justify-center p-4">
@@ -145,6 +170,12 @@ export default function OpsDashboardPage() {
     if (selectedStaff !== "ALL" && s.Staff_ID !== selectedStaff) return false;
     return true;
   });
+
+  // Academic Summary Metrics Calculations
+  const totalStarts = filteredLogs.filter((l) => l.Action_Type === "START");
+  const onTimeStarts = totalStarts.filter((l) => l.Status.includes("ON_TIME"));
+  const onTimePercent = totalStarts.length > 0 ? Math.round((onTimeStarts.length / totalStarts.length) * 100) : 0;
+  const earlyExits = filteredLogs.filter((l) => l.Status.includes("EARLY_EXIT")).length;
 
   const uniqueStaffList = Array.from(new Set(staffLogs.map((s) => s.Staff_ID))).map((id) => {
     const found = staffLogs.find((s) => s.Staff_ID === id);
@@ -203,75 +234,146 @@ export default function OpsDashboardPage() {
           </button>
         </div>
 
-        {/* Filters Bar */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm mb-6 flex flex-wrap gap-4 items-center">
-          <div>
-            <label className="block text-[10px] font-black uppercase text-gray-400 mb-1">Start Date</label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="border rounded-xl px-3 py-2 text-xs font-bold bg-gray-50"
-            />
-          </div>
-          <div>
-            <label className="block text-[10px] font-black uppercase text-gray-400 mb-1">End Date</label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="border rounded-xl px-3 py-2 text-xs font-bold bg-gray-50"
-            />
-          </div>
-
-          {activeTab === "ACADEMIC" ? (
-            <div>
-              <label className="block text-[10px] font-black uppercase text-gray-400 mb-1">Room Filter</label>
-              <select
-                value={selectedRoom}
-                onChange={(e) => setSelectedRoom(e.target.value)}
-                className="border rounded-xl px-3 py-2 text-xs font-bold bg-gray-50"
-              >
-                <option value="ALL">All Rooms</option>
-                <option value="LT-1">LT-1 (Target)</option>
-                <option value="LT-2">LT-2 (11th E/H)</option>
-                <option value="LT-3">LT-3 (12th H.M)</option>
-                <option value="LT-4">LT-4 (11th Maths)</option>
-                <option value="LT-5">LT-5 (12th E.M)</option>
-              </select>
-            </div>
-          ) : (
-            <div>
-              <label className="block text-[10px] font-black uppercase text-gray-400 mb-1">Staff Filter</label>
-              <select
-                value={selectedStaff}
-                onChange={(e) => setSelectedStaff(e.target.value)}
-                className="border rounded-xl px-3 py-2 text-xs font-bold bg-gray-50"
-              >
-                <option value="ALL">All Staff Members</option>
-                {uniqueStaffList.map((st) => (
-                  <option key={st.id} value={st.id}>
-                    {st.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {(startDate || endDate || selectedRoom !== "ALL" || selectedStaff !== "ALL") && (
+        {/* Date Range & Filter Presets Bar */}
+        <div className="bg-white rounded-2xl p-4 shadow-sm mb-6 space-y-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-black uppercase text-gray-400 mr-2">Quick Range:</span>
             <button
-              onClick={() => {
-                setStartDate("");
-                setEndDate("");
-                setSelectedRoom("ALL");
-                setSelectedStaff("ALL");
-              }}
-              className="text-xs font-bold text-red-600 underline mt-4"
+              onClick={() => applyDatePreset("TODAY")}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                datePreset === "TODAY" ? "bg-[#162b66] text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
             >
-              Clear Filters
+              Today
             </button>
-          )}
+            <button
+              onClick={() => applyDatePreset("7DAYS")}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                datePreset === "7DAYS" ? "bg-[#162b66] text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              Last 7 Days
+            </button>
+            <button
+              onClick={() => applyDatePreset("MONTH")}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                datePreset === "MONTH" ? "bg-[#162b66] text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              Current Month
+            </button>
+            <button
+              onClick={() => applyDatePreset("ALL")}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                datePreset === "ALL" ? "bg-[#162b66] text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              All Time
+            </button>
+          </div>
+
+          <div className="flex flex-wrap gap-4 items-center pt-2 border-t border-gray-100">
+            <div>
+              <label className="block text-[10px] font-black uppercase text-gray-400 mb-1">Start Date</label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => {
+                  setStartDate(e.target.value);
+                  setDatePreset("ALL");
+                }}
+                className="border rounded-xl px-3 py-2 text-xs font-bold bg-gray-50"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-black uppercase text-gray-400 mb-1">End Date</label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => {
+                  setEndDate(e.target.value);
+                  setDatePreset("ALL");
+                }}
+                className="border rounded-xl px-3 py-2 text-xs font-bold bg-gray-50"
+              />
+            </div>
+
+            {activeTab === "ACADEMIC" ? (
+              <div>
+                <label className="block text-[10px] font-black uppercase text-gray-400 mb-1">Room Filter</label>
+                <select
+                  value={selectedRoom}
+                  onChange={(e) => setSelectedRoom(e.target.value)}
+                  className="border rounded-xl px-3 py-2 text-xs font-bold bg-gray-50"
+                >
+                  <option value="ALL">All Rooms</option>
+                  <option value="LT-1">LT-1 (Target)</option>
+                  <option value="LT-2">LT-2 (11th E/H)</option>
+                  <option value="LT-3">LT-3 (12th H.M)</option>
+                  <option value="LT-4">LT-4 (11th Maths)</option>
+                  <option value="LT-5">LT-5 (12th E.M)</option>
+                </select>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-[10px] font-black uppercase text-gray-400 mb-1">Staff Filter</label>
+                <select
+                  value={selectedStaff}
+                  onChange={(e) => setSelectedStaff(e.target.value)}
+                  className="border rounded-xl px-3 py-2 text-xs font-bold bg-gray-50"
+                >
+                  <option value="ALL">All Staff Members</option>
+                  {uniqueStaffList.map((st) => (
+                    <option key={st.id} value={st.id}>
+                      {st.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Summary KPI Metrics Cards */}
+        {activeTab === "ACADEMIC" ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-[#162b66]">
+              <p className="text-[10px] font-black uppercase text-gray-400">Classes Started</p>
+              <p className="text-2xl font-black text-[#162b66] mt-1">{totalStarts.length}</p>
+            </div>
+            <div className="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-green-600">
+              <p className="text-[10px] font-black uppercase text-gray-400">On-Time Start %</p>
+              <p className="text-2xl font-black text-green-700 mt-1">{onTimePercent}%</p>
+            </div>
+            <div className="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-amber-500">
+              <p className="text-[10px] font-black uppercase text-gray-400">Early Departures</p>
+              <p className="text-2xl font-black text-amber-600 mt-1">{earlyExits}</p>
+            </div>
+            <div className="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-blue-500">
+              <p className="text-[10px] font-black uppercase text-gray-400">Total Logs Recorded</p>
+              <p className="text-2xl font-black text-blue-700 mt-1">{filteredLogs.length}</p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-[#162b66]">
+              <p className="text-[10px] font-black uppercase text-gray-400">Total Shifts Logged</p>
+              <p className="text-2xl font-black text-[#162b66] mt-1">{filteredStaffLogs.length}</p>
+            </div>
+            <div className="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-green-600">
+              <p className="text-[10px] font-black uppercase text-gray-400">Completed Shifts</p>
+              <p className="text-2xl font-black text-green-700 mt-1">
+                {filteredStaffLogs.filter((s) => s.Status.includes("COMPLETED")).length}
+              </p>
+            </div>
+            <div className="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-blue-500">
+              <p className="text-[10px] font-black uppercase text-gray-400">Active / Open Shifts</p>
+              <p className="text-2xl font-black text-blue-700 mt-1">
+                {filteredStaffLogs.filter((s) => !s.Status.includes("COMPLETED")).length}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Tables */}
         {activeTab === "ACADEMIC" ? (
