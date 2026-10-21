@@ -41,6 +41,20 @@ interface StaffLogItem {
   Device_ID: string;
 }
 
+interface TeacherInfo {
+  id: string;
+  name: string;
+  subject: string;
+}
+
+interface StaffInfo {
+  id: string;
+  name: string;
+  role: string;
+  shiftStart: string;
+  shiftEnd: string;
+}
+
 export default function OpsDashboardPage() {
   const [passcode, setPasscode] = useState("");
   const [isAuthed, setIsAuthed] = useState(false);
@@ -49,14 +63,16 @@ export default function OpsDashboardPage() {
 
   const [activeTab, setActiveTab] = useState<"ACADEMIC" | "STAFF">("ACADEMIC");
 
-  // Filters & Presets
+  // Date Presets & Filters
   const [datePreset, setDatePreset] = useState<"TODAY" | "7DAYS" | "MONTH" | "ALL">("ALL");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedRoom, setSelectedRoom] = useState("ALL");
   const [selectedStaff, setSelectedStaff] = useState("ALL");
 
-  // Data
+  // Master Data from Backend
+  const [teachersMaster, setTeachersMaster] = useState<TeacherInfo[]>([]);
+  const [staffMaster, setStaffMaster] = useState<StaffInfo[]>([]);
   const [logs, setLogs] = useState<LogItem[]>([]);
   const [staffLogs, setStaffLogs] = useState<StaffLogItem[]>([]);
 
@@ -72,6 +88,8 @@ export default function OpsDashboardPage() {
       const data = await res.json();
       if (data.ok) {
         setIsAuthed(true);
+        setTeachersMaster(data.teachers || []);
+        setStaffMaster(data.staff || []);
         setLogs(data.logs || []);
         setStaffLogs(data.staffLogs || []);
       } else {
@@ -92,6 +110,8 @@ export default function OpsDashboardPage() {
       });
       const data = await res.json();
       if (data.ok) {
+        setTeachersMaster(data.teachers || []);
+        setStaffMaster(data.staff || []);
         setLogs(data.logs || []);
         setStaffLogs(data.staffLogs || []);
       }
@@ -100,7 +120,6 @@ export default function OpsDashboardPage() {
     }
   };
 
-  // Handle Date Preset Selection
   const applyDatePreset = (preset: "TODAY" | "7DAYS" | "MONTH" | "ALL") => {
     setDatePreset(preset);
     const todayStr = new Date().toISOString().split("T")[0];
@@ -155,7 +174,7 @@ export default function OpsDashboardPage() {
     );
   }
 
-  // Filter Academic Logs
+  // Filtered Logs
   const filteredLogs = logs.filter((l) => {
     if (startDate && l.Date_Str < startDate) return false;
     if (endDate && l.Date_Str > endDate) return false;
@@ -163,7 +182,6 @@ export default function OpsDashboardPage() {
     return true;
   });
 
-  // Filter Staff Logs
   const filteredStaffLogs = staffLogs.filter((s) => {
     if (startDate && s.Date_Str < startDate) return false;
     if (endDate && s.Date_Str > endDate) return false;
@@ -171,16 +189,51 @@ export default function OpsDashboardPage() {
     return true;
   });
 
-  // Academic Summary Metrics Calculations
-  const totalStarts = filteredLogs.filter((l) => l.Action_Type === "START");
-  const onTimeStarts = totalStarts.filter((l) => l.Status.includes("ON_TIME"));
-  const onTimePercent = totalStarts.length > 0 ? Math.round((onTimeStarts.length / totalStarts.length) * 100) : 0;
-  const earlyExits = filteredLogs.filter((l) => l.Status.includes("EARLY_EXIT")).length;
-
-  const uniqueStaffList = Array.from(new Set(staffLogs.map((s) => s.Staff_ID))).map((id) => {
-    const found = staffLogs.find((s) => s.Staff_ID === id);
-    return { id, name: found?.Staff_Name || id };
+  // Aggregate Teacher Summary Data
+  const teacherSummaryMap: { [id: string]: { name: string; subject: string; classes: number; onTime: number; earlyExits: number } } = {};
+  teachersMaster.forEach((t) => {
+    teacherSummaryMap[t.id] = { name: t.name, subject: t.subject, classes: 0, onTime: 0, earlyExits: 0 };
   });
+
+  filteredLogs.forEach((l) => {
+    if (!teacherSummaryMap[l.Teacher_ID]) {
+      teacherSummaryMap[l.Teacher_ID] = { name: l.Teacher_Name, subject: "-", classes: 0, onTime: 0, earlyExits: 0 };
+    }
+    if (l.Action_Type === "START") {
+      teacherSummaryMap[l.Teacher_ID].classes += 1;
+      if (l.Status.includes("ON_TIME")) {
+        teacherSummaryMap[l.Teacher_ID].onTime += 1;
+      }
+    }
+    if (l.Status.includes("EARLY_EXIT")) {
+      teacherSummaryMap[l.Teacher_ID].earlyExits += 1;
+    }
+  });
+
+  const teacherSummaryList = Object.values(teacherSummaryMap);
+
+  // Aggregate Non-Academic Employee Summary Data
+  const staffSummaryMap: { [id: string]: { name: string; role: string; shifts: number; completed: number; onTimeCheckIns: number; totalMins: number } } = {};
+  staffMaster.forEach((s) => {
+    staffSummaryMap[s.id] = { name: s.name, role: s.role, shifts: 0, completed: 0, onTimeCheckIns: 0, totalMins: 0 };
+  });
+
+  filteredStaffLogs.forEach((s) => {
+    if (!staffSummaryMap[s.Staff_ID]) {
+      staffSummaryMap[s.Staff_ID] = { name: s.Staff_Name, role: s.Role, shifts: 0, completed: 0, onTimeCheckIns: 0, totalMins: 0 };
+    }
+    staffSummaryMap[s.Staff_ID].shifts += 1;
+    if (s.Status.includes("COMPLETED")) {
+      staffSummaryMap[s.Staff_ID].completed += 1;
+    }
+    if (s.Status.includes("ON_TIME")) {
+      staffSummaryMap[s.Staff_ID].onTimeCheckIns += 1;
+    }
+    const mins = Number(s.Duration_Mins) || 0;
+    staffSummaryMap[s.Staff_ID].totalMins += mins;
+  });
+
+  const staffSummaryList = Object.values(staffSummaryMap);
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900 pb-12">
@@ -220,7 +273,7 @@ export default function OpsDashboardPage() {
                 : "border-transparent text-gray-500 hover:text-gray-800"
             }`}
           >
-            📚 Academic Faculty Logs ({filteredLogs.length})
+            📚 Academic Faculty Summary & Logs
           </button>
           <button
             onClick={() => setActiveTab("STAFF")}
@@ -230,7 +283,7 @@ export default function OpsDashboardPage() {
                 : "border-transparent text-gray-500 hover:text-gray-800"
             }`}
           >
-            🏢 Non-Academic Staff Shift Tracker ({filteredStaffLogs.length})
+            🏢 Non-Academic Staff Summary & Shifts
           </button>
         </div>
 
@@ -323,7 +376,7 @@ export default function OpsDashboardPage() {
                   className="border rounded-xl px-3 py-2 text-xs font-bold bg-gray-50"
                 >
                   <option value="ALL">All Staff Members</option>
-                  {uniqueStaffList.map((st) => (
+                  {staffMaster.map((st) => (
                     <option key={st.id} value={st.id}>
                       {st.name}
                     </option>
@@ -334,166 +387,227 @@ export default function OpsDashboardPage() {
           </div>
         </div>
 
-        {/* Summary KPI Metrics Cards */}
-        {activeTab === "ACADEMIC" ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-[#162b66]">
-              <p className="text-[10px] font-black uppercase text-gray-400">Classes Started</p>
-              <p className="text-2xl font-black text-[#162b66] mt-1">{totalStarts.length}</p>
+        {/* ==================================================================== */}
+        {/* ACADEMIC TAB CONTENT                                                 */}
+        {/* ==================================================================== */}
+        {activeTab === "ACADEMIC" && (
+          <div className="space-y-8">
+            {/* Teacher-Wise Summary Table */}
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden p-5">
+              <h2 className="text-sm font-black text-[#162b66] uppercase tracking-wider mb-4">
+                👨‍🏫 Teacher-Wise Performance Summary ({datePreset})
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-gray-50 border-b text-gray-500 uppercase tracking-wider">
+                      <th className="p-3">Faculty Name & Subject</th>
+                      <th className="p-3 text-center">Classes Taken</th>
+                      <th className="p-3 text-center">On-Time Starts</th>
+                      <th className="p-3 text-center">On-Time %</th>
+                      <th className="p-3 text-center">Early Departures</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {teacherSummaryList.map((t, i) => {
+                      const pct = t.classes > 0 ? Math.round((t.onTime / t.classes) * 100) : 0;
+                      return (
+                        <tr key={i} className="hover:bg-gray-50">
+                          <td className="p-3">
+                            <span className="font-bold text-[#162b66]">{t.name}</span>
+                            <span className="block text-[10px] text-gray-500">{t.subject}</span>
+                          </td>
+                          <td className="p-3 text-center font-black">{t.classes}</td>
+                          <td className="p-3 text-center font-bold text-green-700">{t.onTime}</td>
+                          <td className="p-3 text-center">
+                            <span
+                              className={`px-2 py-0.5 rounded-md font-bold text-[10px] ${
+                                pct >= 80 ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"
+                              }`}
+                            >
+                              {pct}%
+                            </span>
+                          </td>
+                          <td className="p-3 text-center font-bold text-red-600">{t.earlyExits}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <div className="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-green-600">
-              <p className="text-[10px] font-black uppercase text-gray-400">On-Time Start %</p>
-              <p className="text-2xl font-black text-green-700 mt-1">{onTimePercent}%</p>
-            </div>
-            <div className="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-amber-500">
-              <p className="text-[10px] font-black uppercase text-gray-400">Early Departures</p>
-              <p className="text-2xl font-black text-amber-600 mt-1">{earlyExits}</p>
-            </div>
-            <div className="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-blue-500">
-              <p className="text-[10px] font-black uppercase text-gray-400">Total Logs Recorded</p>
-              <p className="text-2xl font-black text-blue-700 mt-1">{filteredLogs.length}</p>
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-[#162b66]">
-              <p className="text-[10px] font-black uppercase text-gray-400">Total Shifts Logged</p>
-              <p className="text-2xl font-black text-[#162b66] mt-1">{filteredStaffLogs.length}</p>
-            </div>
-            <div className="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-green-600">
-              <p className="text-[10px] font-black uppercase text-gray-400">Completed Shifts</p>
-              <p className="text-2xl font-black text-green-700 mt-1">
-                {filteredStaffLogs.filter((s) => s.Status.includes("COMPLETED")).length}
-              </p>
-            </div>
-            <div className="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-blue-500">
-              <p className="text-[10px] font-black uppercase text-gray-400">Active / Open Shifts</p>
-              <p className="text-2xl font-black text-blue-700 mt-1">
-                {filteredStaffLogs.filter((s) => !s.Status.includes("COMPLETED")).length}
-              </p>
+
+            {/* Detailed Academic Logs Table */}
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden p-5">
+              <h2 className="text-sm font-black text-[#162b66] uppercase tracking-wider mb-4">
+                📜 Detailed Classroom Scan Logs ({filteredLogs.length})
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-gray-50 border-b text-gray-500 uppercase tracking-wider">
+                      <th className="p-3">Date & Time</th>
+                      <th className="p-3">Room / Batch</th>
+                      <th className="p-3">Faculty</th>
+                      <th className="p-3">Action</th>
+                      <th className="p-3">Scheduled</th>
+                      <th className="p-3">Actual</th>
+                      <th className="p-3">Status / Delay</th>
+                      <th className="p-3">Topic / DPP</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {filteredLogs.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="text-center py-8 text-gray-400 font-bold">
+                          No academic scan logs found for the selected filter.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredLogs.map((l, i) => (
+                        <tr key={i} className="hover:bg-gray-50">
+                          <td className="p-3 font-bold">{l.Date_Str}</td>
+                          <td className="p-3">
+                            <span className="font-bold text-[#162b66]">{l.Room}</span>
+                            <span className="block text-[10px] text-gray-500">{l.Batch}</span>
+                          </td>
+                          <td className="p-3 font-bold">{l.Teacher_Name}</td>
+                          <td className="p-3">
+                            <span
+                              className={`px-2 py-0.5 rounded-md font-bold text-[10px] ${
+                                l.Action_Type === "START" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                              }`}
+                            >
+                              {l.Action_Type}
+                            </span>
+                          </td>
+                          <td className="p-3 text-gray-600">
+                            {l.Scheduled_Start} - {l.Scheduled_End}
+                          </td>
+                          <td className="p-3 font-bold">{l.Actual_Time}</td>
+                          <td className="p-3">
+                            <span
+                              className={`font-bold ${
+                                l.Status.includes("ON_TIME") || l.Status.includes("PROPER")
+                                  ? "text-green-600"
+                                  : "text-amber-600"
+                              }`}
+                            >
+                              {l.Status}
+                            </span>
+                          </td>
+                          <td className="p-3 text-gray-600 italic">{l.Topic_DPP}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Tables */}
-        {activeTab === "ACADEMIC" ? (
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="bg-gray-50 border-b text-gray-500 uppercase tracking-wider">
-                    <th className="p-3">Date & Time</th>
-                    <th className="p-3">Room / Batch</th>
-                    <th className="p-3">Faculty</th>
-                    <th className="p-3">Action</th>
-                    <th className="p-3">Scheduled</th>
-                    <th className="p-3">Actual</th>
-                    <th className="p-3">Status / Delay</th>
-                    <th className="p-3">Topic / DPP</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {filteredLogs.length === 0 ? (
-                    <tr>
-                      <td colSpan={8} className="text-center py-8 text-gray-400 font-bold">
-                        No academic scan logs found for the selected filter.
-                      </td>
+        {/* ==================================================================== */}
+        {/* NON-ACADEMIC STAFF TAB CONTENT                                       */}
+        {/* ==================================================================== */}
+        {activeTab === "STAFF" && (
+          <div className="space-y-8">
+            {/* Employee-Wise Summary Table */}
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden p-5">
+              <h2 className="text-sm font-black text-[#162b66] uppercase tracking-wider mb-4">
+                👔 Non-Academic Employee Performance Summary ({datePreset})
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-gray-50 border-b text-gray-500 uppercase tracking-wider">
+                      <th className="p-3">Employee Name & Role</th>
+                      <th className="p-3 text-center">Shifts Logged</th>
+                      <th className="p-3 text-center">Completed</th>
+                      <th className="p-3 text-center">On-Time Check-Ins</th>
+                      <th className="p-3 text-center">Avg Daily Hours</th>
                     </tr>
-                  ) : (
-                    filteredLogs.map((l, i) => (
-                      <tr key={i} className="hover:bg-gray-50">
-                        <td className="p-3 font-bold">{l.Date_Str}</td>
-                        <td className="p-3">
-                          <span className="font-bold text-[#162b66]">{l.Room}</span>
-                          <span className="block text-[10px] text-gray-500">{l.Batch}</span>
-                        </td>
-                        <td className="p-3 font-bold">{l.Teacher_Name}</td>
-                        <td className="p-3">
-                          <span
-                            className={`px-2 py-0.5 rounded-md font-bold text-[10px] ${
-                              l.Action_Type === "START" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                            }`}
-                          >
-                            {l.Action_Type}
-                          </span>
-                        </td>
-                        <td className="p-3 text-gray-600">
-                          {l.Scheduled_Start} - {l.Scheduled_End}
-                        </td>
-                        <td className="p-3 font-bold">{l.Actual_Time}</td>
-                        <td className="p-3">
-                          <span
-                            className={`font-bold ${
-                              l.Status.includes("ON_TIME") || l.Status.includes("PROPER")
-                                ? "text-green-600"
-                                : "text-amber-600"
-                            }`}
-                          >
-                            {l.Status}
-                          </span>
-                        </td>
-                        <td className="p-3 text-gray-600 italic">{l.Topic_DPP}</td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {staffSummaryList.map((s, i) => {
+                      const avgMins = s.shifts > 0 ? Math.round(s.totalMins / s.shifts) : 0;
+                      const avgHoursFormatted = `${Math.floor(avgMins / 60)}h ${avgMins % 60}m`;
+                      return (
+                        <tr key={i} className="hover:bg-gray-50">
+                          <td className="p-3">
+                            <span className="font-bold text-[#162b66]">{s.name}</span>
+                            <span className="block text-[10px] text-gray-500">{s.role}</span>
+                          </td>
+                          <td className="p-3 text-center font-black">{s.shifts}</td>
+                          <td className="p-3 text-center font-bold text-green-700">{s.completed}</td>
+                          <td className="p-3 text-center font-bold text-blue-700">{s.onTimeCheckIns}</td>
+                          <td className="p-3 text-center font-bold text-gray-700">{avgHoursFormatted}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="bg-gray-50 border-b text-gray-500 uppercase tracking-wider">
-                    <th className="p-3">Date</th>
-                    <th className="p-3">Staff Name & Role</th>
-                    <th className="p-3">Shift Timing</th>
-                    <th className="p-3">Check-In</th>
-                    <th className="p-3">Check-Out</th>
-                    <th className="p-3">Total Duration</th>
-                    <th className="p-3">Status</th>
-                    <th className="p-3">Notes</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {filteredStaffLogs.length === 0 ? (
-                    <tr>
-                      <td colSpan={8} className="text-center py-8 text-gray-400 font-bold">
-                        No non-academic staff logs found for the selected filter.
-                      </td>
+
+            {/* Detailed Staff Shift Logs Table */}
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden p-5">
+              <h2 className="text-sm font-black text-[#162b66] uppercase tracking-wider mb-4">
+                📜 Detailed Shift Logs ({filteredStaffLogs.length})
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-gray-50 border-b text-gray-500 uppercase tracking-wider">
+                      <th className="p-3">Date</th>
+                      <th className="p-3">Staff Name & Role</th>
+                      <th className="p-3">Shift Timing</th>
+                      <th className="p-3">Check-In</th>
+                      <th className="p-3">Check-Out</th>
+                      <th className="p-3">Total Duration</th>
+                      <th className="p-3">Status</th>
+                      <th className="p-3">Notes</th>
                     </tr>
-                  ) : (
-                    filteredStaffLogs.map((s, i) => (
-                      <tr key={i} className="hover:bg-gray-50">
-                        <td className="p-3 font-bold">{s.Date_Str}</td>
-                        <td className="p-3">
-                          <span className="font-bold text-[#162b66]">{s.Staff_Name}</span>
-                          <span className="block text-[10px] text-gray-500">{s.Role}</span>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {filteredStaffLogs.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="text-center py-8 text-gray-400 font-bold">
+                          No non-academic staff logs found for the selected filter.
                         </td>
-                        <td className="p-3 text-gray-600">
-                          {s.Shift_Start} - {s.Shift_End}
-                        </td>
-                        <td className="p-3 font-bold text-green-700">{s.Check_In_Time || "-"}</td>
-                        <td className="p-3 font-bold text-red-700">{s.Check_Out_Time || "Active Shift"}</td>
-                        <td className="p-3 font-black text-[#162b66]">{s.Duration_Formatted || "-"}</td>
-                        <td className="p-3">
-                          <span
-                            className={`px-2 py-0.5 rounded-md font-bold text-[10px] ${
-                              s.Status.includes("COMPLETED")
-                                ? "bg-green-100 text-green-800"
-                                : "bg-blue-100 text-blue-800"
-                            }`}
-                          >
-                            {s.Status}
-                          </span>
-                        </td>
-                        <td className="p-3 text-gray-600 italic">{s.Notes}</td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ) : (
+                      filteredStaffLogs.map((s, i) => (
+                        <tr key={i} className="hover:bg-gray-50">
+                          <td className="p-3 font-bold">{s.Date_Str}</td>
+                          <td className="p-3">
+                            <span className="font-bold text-[#162b66]">{s.Staff_Name}</span>
+                            <span className="block text-[10px] text-gray-500">{s.Role}</span>
+                          </td>
+                          <td className="p-3 text-gray-600">
+                            {s.Shift_Start} - {s.Shift_End}
+                          </td>
+                          <td className="p-3 font-bold text-green-700">{s.Check_In_Time || "-"}</td>
+                          <td className="p-3 font-bold text-red-700">{s.Check_Out_Time || "Active Shift"}</td>
+                          <td className="p-3 font-black text-[#162b66]">{s.Duration_Formatted || "-"}</td>
+                          <td className="p-3">
+                            <span
+                              className={`px-2 py-0.5 rounded-md font-bold text-[10px] ${
+                                s.Status.includes("COMPLETED")
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-blue-100 text-blue-800"
+                              }`}
+                            >
+                              {s.Status}
+                            </span>
+                          </td>
+                          <td className="p-3 text-gray-600 italic">{s.Notes}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
