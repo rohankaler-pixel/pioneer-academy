@@ -1,85 +1,61 @@
 "use client";
 
 import React from "react";
+import { QRCodeSVG } from "qrcode.react";
 
-const ROOMS = [
-  { room: "STAFF", subtitle: "Non-Academic Staff Shift Check-In & Check-Out (Reception)" },
-  { room: "LT-1", subtitle: "Target (Repeater) Batch" },
-  { room: "LT-2", subtitle: "Class 11th (English & Hindi Medium)" },
-  { room: "LT-3", subtitle: "Class 12th (Hindi Medium)" },
-  { room: "LT-4", subtitle: "Class 11th (Mathematics)" },
-  { room: "LT-5", subtitle: "Class 12th (English Medium)" }
-];
+export default function QRPrintPage() {
+  const baseUrl = "https://pioneeracademybikaner.com/ops/scan";
 
-export default function PrintableQRPosters() {
+  const posters = [
+    { room: "STAFF", title: "Non-Academic Staff Office", subtitle: "Daily Shift Check-In & Check-Out" },
+    { room: "LT-1", title: "Lecture Theater 1", subtitle: "Target Batch Classroom" },
+    { room: "LT-2", title: "Lecture Theater 2", subtitle: "11th English & Hindi Medium" },
+    { room: "LT-3", title: "Lecture Theater 3", subtitle: "12th Hindi Medium Batch" },
+    { room: "LT-4", title: "Lecture Theater 4", subtitle: "11th Mathematics Batch" },
+    { room: "LT-5", title: "Lecture Theater 5", subtitle: "12th English Medium Batch" },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-100 p-6 print:p-0 print:bg-white">
-      <div className="max-w-4xl mx-auto mb-6 flex justify-between items-center print:hidden bg-[#162b66] text-white p-4 rounded-xl">
-        <div>
-          <h1 className="text-xl font-black">
-            Pioneer Academy QR Generator (LT-1 to LT-5 + Non-Academic STAFF)
-          </h1>
-          <p className="text-xs text-gray-300">
-            Print and laminate these 6 sheets. Paste the STAFF poster at Reception and LT-1..LT-5 in classrooms.
-          </p>
-        </div>
+    <div className="min-h-screen bg-gray-200 p-8 print:p-0 print:bg-white">
+      <div className="max-w-4xl mx-auto mb-6 flex justify-between items-center print:hidden">
+        <h1 className="text-xl font-black text-[#162b66]">Printable QR Posters (6 Sheets)</h1>
         <button
           onClick={() => window.print()}
-          className="bg-[#f9d200] text-[#162b66] px-5 py-2.5 rounded-lg font-black text-sm shadow-md"
+          className="bg-[#162b66] text-[#f9d200] font-black px-6 py-3 rounded-xl shadow hover:bg-[#1f3a8a] transition"
         >
-          🖨️ Print All 6 Posters
+          🖨️ Print All Posters (A4)
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto print:grid-cols-2">
-        {ROOMS.map((item) => {
-          const isStaff = item.room === "STAFF";
-          const scanUrl = `https://pioneeracademybikaner.com/ops/scan?room=${item.room}`;
-          const qrImgSrc = `https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=10&data=${encodeURIComponent(
-            scanUrl
-          )}`;
-
+      <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 print:block">
+        {posters.map((p, idx) => {
+          const scanUrl = `${baseUrl}?room=${p.room}`;
           return (
             <div
-              key={item.room}
-              className="bg-white border-4 border-[#162b66] rounded-3xl p-8 text-center shadow-lg flex flex-col items-center justify-between break-inside-avoid"
+              key={idx}
+              className="bg-white border-4 border-[#162b66] rounded-3xl p-8 text-center shadow-xl break-after-page print:shadow-none print:border-8 print:my-0 print:h-screen print:flex print:flex-col print:justify-between"
             >
-              <div className="w-full bg-[#162b66] text-white py-3 px-4 rounded-2xl mb-4 border-b-4 border-[#f9d200]">
-                <p className="text-xs font-bold text-[#f9d200] uppercase tracking-widest">
-                  Pioneer Academy Bikaner
+              <div>
+                <p className="text-xs font-black uppercase tracking-widest text-[#f9d200] bg-[#162b66] py-1.5 px-4 rounded-full inline-block mb-3">
+                  Pioneer Academy Bikaner • Geofenced Ops
                 </p>
-                <h2 className="text-3xl font-black mt-1">
-                  {isStaff ? "OFFICE STAFF QR" : item.room}
-                </h2>
-                <p className="text-xs text-gray-200 font-semibold mt-0.5">{item.subtitle}</p>
+                <h2 className="text-3xl font-black text-[#162b66]">{p.title}</h2>
+                <p className="text-sm font-bold text-gray-500 mt-1">{p.subtitle}</p>
               </div>
 
-              <div className="p-3 border-2 border-dashed border-gray-300 rounded-2xl my-2">
-                <img
-                  src={qrImgSrc}
-                  alt={`QR Code for ${item.room}`}
-                  className="w-56 h-56 object-contain"
-                />
+              <div className="my-8 flex justify-center">
+                <div className="p-4 border-4 border-dashed border-[#162b66] rounded-3xl bg-gray-50">
+                  <QRCodeSVG value={scanUrl} size={240} level="H" includeMargin={true} />
+                </div>
               </div>
 
-              <div className="mt-4 space-y-1 text-xs text-gray-700 font-bold bg-gray-50 p-3 rounded-xl w-full border border-gray-200">
-                <p className="text-[#162b66] font-black text-sm">
-                  {isStaff
-                    ? "NON-ACADEMIC STAFF CHECK-IN / CHECK-OUT"
-                    : "FACULTY ATTENDANCE & SYLLABUS LOG"}
-                </p>
-                {isStaff ? (
-                  <>
-                    <p>1. ऑफिस आने पर स्कैन करें और 🟢 CHECK IN दबाएं।</p>
-                    <p>2. ऑफिस से जाते समय स्कैन करें और 🔴 CHECK OUT दबाएं।</p>
-                  </>
-                ) : (
-                  <>
-                    <p>1. कक्षा शुरू करते समय स्कैन करें और 🟢 START दबाएं।</p>
-                    <p>2. कक्षा समाप्त होने पर पुनः स्कैन करें और 🔴 END दबाएं।</p>
-                  </>
-                )}
-                <p className="text-[10px] text-gray-400 pt-1">{scanUrl}</p>
+              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
+                <p className="text-xs font-black uppercase text-[#162b66]">How to use:</p>
+                <ol className="text-xs text-gray-700 mt-1 space-y-1 font-medium">
+                  <li>1. Scan using your smartphone camera.</li>
+                  <li>2. Ensure GPS location permission is allowed.</li>
+                  <li>3. Select your name &amp; enter your 4-digit PIN.</li>
+                </ol>
               </div>
             </div>
           );
